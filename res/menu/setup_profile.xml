@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.get.jacd.SetupProfile" >
+
+    <item
+        android:id="@+id/menu_finish"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/finish_profile"/>
+
+</menu>
