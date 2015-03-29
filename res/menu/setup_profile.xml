@@ -7,5 +7,6 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/finish_profile"/>
+    <item android:id="@+id/menu_logout" android:title="Logout"></item>
 
 </menu>

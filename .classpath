@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/apps/GetJac&apos;d/libs/Parse/bolts-android-1.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/apps/GetJac&apos;d/libs/Parse/Parse-1.9.0.jar"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/AppData/Local/Android/sdk/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/apps/Parse/Parse-1.9.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/apps/Parse/bolts-android-1.1.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

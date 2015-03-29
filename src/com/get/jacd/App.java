@@ -1,8 +1,7 @@
 package com.get.jacd;
 
+import com.parse.Parse;
 import android.app.Application;
-
-import com.parse.Parse; 
 
 public class App extends Application { 
 
@@ -13,3 +12,4 @@ public class App extends Application {
 		Parse.initialize(this, "sNrmuyZNFlHDBKnm6zWK9PAw268mizNbaGhV5yCA", "45eBZjg49zX6zNjpgQQfMkAFRFWAq2QrRMatxolZ");
     }
 } 
+

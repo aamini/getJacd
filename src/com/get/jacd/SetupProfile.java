@@ -128,8 +128,8 @@ public class SetupProfile extends Activity {
     	progress = new ProgressDialog(this);
     	progress.setTitle("Loading");
     	progress.setMessage("Retrieving Data...");
-    	progress.show();
     	progress.setCancelable(false);
+    	progress.show();
     	
     	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
     	query.whereEqualTo("Email", email);
@@ -294,10 +294,19 @@ public class SetupProfile extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.menu_finish) {
+		switch (id) {
+		case (R.id.menu_finish):
 			finishProfile();
 			return true;
+		case (R.id.menu_logout):
+    		getSharedPreferences(SignIn.PREFS_NAME, MODE_PRIVATE)
+    		.edit()
+    		.clear()
+    		.commit();
+			finish();
+			return true;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 	

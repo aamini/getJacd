@@ -15,9 +15,11 @@ import com.parse.SaveCallback;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -28,17 +30,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class SignIn extends Activity {
 
 	private final static int PICK_ACCOUNT_REQUEST = 1;
+	public final static String PREFS_NAME = "SIGN_IN_PREFRENCES";
+	private final static String PREF_EMAIL = "SAVED_EMAIL_ADDRESS";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sign_in);
+		
+        SharedPreferences pref = getSharedPreferences(PREFS_NAME,MODE_PRIVATE);
+        String rememberedEmail = pref.getString(PREF_EMAIL, null);
+        if (rememberedEmail!=null) {
+        	signIn(rememberedEmail,true);
+        }
+        
 		
 		ImageButton button = (ImageButton) findViewById(R.id.button_sign_in);
 		button.setOnClickListener(new OnClickListener() {
@@ -55,32 +67,67 @@ public class SignIn extends Activity {
     protected void onActivityResult(final int requestCode, 
                                     final int resultCode, final Intent data) {
         if (requestCode == PICK_ACCOUNT_REQUEST && resultCode == RESULT_OK && isNetworkAvailable() ) {
-            String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            
-        	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-        	query.whereEqualTo("Email", accountName);
-        	try {
-				List<ParseObject> users = query.find();
-
-				if (users.size()==0) {
-					ParseObject user = new ParseObject("User");
-					user.put("Email", accountName);
-					user.save();
-				}
-			} catch (ParseException e) {
-				e.printStackTrace();
-			} 
-
+        	String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         	
-            
-            Intent myIntent = new Intent(SignIn.this, SetupProfile.class);
-            myIntent.putExtra("email", accountName); //Optional parameters
-            SignIn.this.startActivity(myIntent);
-            finish();
-
+        	CheckBox rememberCheck = (CheckBox) findViewById(R.id.remember_me_check);
+        	signIn(accountName,rememberCheck.isChecked());
         }
     }
 
+    
+    /**
+     * Signs into app with accountName
+     * @param accountName account to sign in with
+     */
+    private void signIn(String accountName, boolean rememberMe) {
+    	ProgressDialog progress = new ProgressDialog(this);
+    	progress.setTitle("Loading");
+    	progress.setMessage("Signing In...");
+    	progress.setCancelable(false);
+    	progress.show();
+    	
+    	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+    	query.whereEqualTo("Email", accountName);
+    	try {
+			List<ParseObject> users = query.find();
+
+			if (users.size()==0) { //new user
+				ParseObject user = new ParseObject("User");
+				user.put("Email", accountName);
+				user.save();
+			} else { //user already exists
+				//TODO: move to map
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	
+    	if (rememberMe) {
+    		getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+    		.edit()
+    		.putString(PREF_EMAIL, accountName)
+    		.commit();
+    	} else {
+    		getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+    		.edit()
+    		.clear()
+    		.commit();
+    	}
+    	
+    	progress.dismiss();
+    	
+        //start profile setup intent 
+        Intent myIntent = new Intent(SignIn.this, SetupProfile.class);
+        myIntent.putExtra("email", accountName); //Optional parameters
+        SignIn.this.startActivity(myIntent);
+        finish();	
+        return;
+	}
+
+	/**
+     * Check if network is available on device
+     * @return true if network is connected, false otherwise
+     */
 	public boolean isNetworkAvailable() {
 		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo activeNetworkInfo = connectivityManager
@@ -104,23 +151,6 @@ public class SignIn extends Activity {
 		}
 		return available;
 	}
-    
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.sign_in, menu);
-		return true;
-	}
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+	
 }
