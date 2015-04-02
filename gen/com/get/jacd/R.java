@@ -36,37 +36,32 @@ public final class R {
         public static final int sign_in=0x7f020005;
     }
     public static final class id {
-        public static final int action_example=0x7f080015;
-        public static final int action_settings=0x7f080014;
-        public static final int agelabel=0x7f08000a;
-        public static final int button_sign_in=0x7f08000f;
-        public static final int container=0x7f080001;
-        public static final int drawer_layout=0x7f080000;
-        public static final int finish_button=0x7f08000e;
-        public static final int gender_radio=0x7f080007;
-        public static final int genderlabel=0x7f080006;
-        public static final int imageView1=0x7f080011;
-        public static final int imageView2=0x7f080010;
-        public static final int locationlabel=0x7f08000c;
-        public static final int menu_finish=0x7f080016;
-        public static final int menu_logout=0x7f080017;
-        public static final int navigation_drawer=0x7f080002;
-        public static final int profile_image=0x7f080003;
-        public static final int radio_female=0x7f080009;
-        public static final int radio_male=0x7f080008;
-        public static final int remember_me_check=0x7f080012;
-        public static final int section_label=0x7f080013;
-        public static final int spinner_age=0x7f08000b;
-        public static final int text_first=0x7f080004;
-        public static final int text_last=0x7f080005;
-        public static final int text_location=0x7f08000d;
+        public static final int action_example=0x7f080013;
+        public static final int action_settings=0x7f080012;
+        public static final int agelabel=0x7f080007;
+        public static final int button_get_location_profile=0x7f08000b;
+        public static final int button_sign_in=0x7f08000e;
+        public static final int finish_button=0x7f08000d;
+        public static final int gender_radio=0x7f080004;
+        public static final int genderlabel=0x7f080003;
+        public static final int imageView1=0x7f080010;
+        public static final int imageView2=0x7f08000f;
+        public static final int locationlabel=0x7f080009;
+        public static final int menu_finish=0x7f080014;
+        public static final int menu_logout=0x7f080015;
+        public static final int profile_image=0x7f080000;
+        public static final int progressBar=0x7f08000c;
+        public static final int radio_female=0x7f080006;
+        public static final int radio_male=0x7f080005;
+        public static final int remember_me_check=0x7f080011;
+        public static final int spinner_age=0x7f080008;
+        public static final int text_first=0x7f080001;
+        public static final int text_last=0x7f080002;
+        public static final int text_location=0x7f08000a;
     }
     public static final class layout {
-        public static final int activity_main=0x7f030000;
-        public static final int activity_setup_profile=0x7f030001;
-        public static final int activity_sign_in=0x7f030002;
-        public static final int fragment_main=0x7f030003;
-        public static final int fragment_navigation_drawer=0x7f030004;
+        public static final int activity_setup_profile=0x7f030000;
+        public static final int activity_sign_in=0x7f030001;
     }
     public static final class menu {
         public static final int global=0x7f070000;

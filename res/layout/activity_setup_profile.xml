@@ -75,14 +75,12 @@
                 android:id="@+id/radio_male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onRadioButtonClicked"
                 android:text="@string/male" />
 
             <RadioButton
                 android:id="@+id/radio_female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:onClick="onRadioButtonClicked"
                 android:text="@string/female" />
         </RadioGroup>
     </LinearLayout>
@@ -110,6 +108,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_weight="1"
         android:orientation="horizontal" >
 
         <TextView
@@ -123,9 +122,24 @@
             android:id="@+id/text_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
             android:hint="@string/location"
-            android:inputType="textPostalAddress" >
-        </EditText>
+            android:inputType="textPostalAddress" />
+
+        <ImageButton
+            android:id="@+id/button_get_location_profile"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/ic_dialog_map" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout

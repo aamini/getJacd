@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
@@ -21,9 +22,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -33,6 +40,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
@@ -47,7 +55,7 @@ public class SetupProfile extends Activity {
 	private static final int DEFAULT_PROFILE = R.drawable.ic_launcher;
 	
 	private String email = null; 
-	private ImageButton profileImage;
+	private ImageButton profileImage,locationButton;
 	private Bitmap profile;
 	private Uri profileURI;
 	ProgressDialog progress;
@@ -56,8 +64,7 @@ public class SetupProfile extends Activity {
 	private Spinner ageSpinner;
 	private RadioGroup genderGroup ;
 	private List<RadioButton> genderRadio = new ArrayList<RadioButton>();
-	
-
+	private ProgressBar pb;
 	
 	@Override
 	protected void onStart() {
@@ -103,6 +110,48 @@ public class SetupProfile extends Activity {
 			}
 		});
 		
+		
+		locationButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Acquire a reference to the system Location Manager
+				locationButton.setVisibility(View.GONE);
+				pb.setVisibility(View.VISIBLE);
+				
+				final LocationManager locationManager = (LocationManager) SetupProfile.this.getSystemService(Context.LOCATION_SERVICE);
+
+				// Define a listener that responds to location updates
+				LocationListener locationListener = new LocationListener() {
+					public void onLocationChanged(Location location) {
+						Geocoder geoCoder = new Geocoder(SetupProfile.this,
+								Locale.getDefault());
+						try {
+							List<Address> addresses = geoCoder.getFromLocation(location.getLatitude(),location.getLongitude(), 1);
+							Address address = addresses.get(0);
+							locationBox.setText(address.getLocality()+ ", "+address.getAdminArea()+" "+address.getPostalCode());
+						} catch (IOException e) {
+						} catch (NullPointerException e) {}
+
+
+						locationButton.setVisibility(View.VISIBLE);
+						pb.setVisibility(View.GONE);
+						
+						locationManager.removeUpdates(this);
+					}
+
+				    public void onStatusChanged(String provider, int status, Bundle extras) {}
+				    public void onProviderEnabled(String provider) {}
+				    public void onProviderDisabled(String provider) {}
+				  };
+
+				// Register the listener with the Location Manager to receive location updates
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+				
+				
+			}
+		});
+		
 		Button finishButton = (Button) findViewById(R.id.finish_button);
 		finishButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -119,16 +168,16 @@ public class SetupProfile extends Activity {
     private void initViews() {
 		firstBox = (EditText) findViewById(R.id.text_first);
 		lastBox = (EditText) findViewById(R.id.text_last);
-		locationBox = (EditText) findViewById(R.id.text_location);
+		locationBox = (EditText) findViewById(R.id.text_location); locationBox.setEnabled(false);
+		pb = (ProgressBar) findViewById(R.id.progressBar);
 		genderRadio.add((RadioButton) findViewById(R.id.radio_male));
 		genderRadio.add((RadioButton) findViewById(R.id.radio_female));
 		genderGroup = (RadioGroup) findViewById(R.id.gender_radio);
 		ageSpinner = (Spinner) findViewById(R.id.spinner_age);
+		locationButton = (ImageButton) findViewById(R.id.button_get_location_profile);
 		profileImage = (ImageButton) findViewById(R.id.profile_image);
 		
 		profile = BitmapFactory.decodeResource(getResources(), DEFAULT_PROFILE);
-
-
 	}
 
 
