@@ -8,5 +8,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/AppData/Local/Android/sdk/extras/google/google_play_services/libproject/google-play-services_lib/libs/google-play-services.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/apps/GetJac&apos;d/libs/Flurry/Flurry Analytics/FlurryAnalytics-5.3.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

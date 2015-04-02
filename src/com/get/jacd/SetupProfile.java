@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -33,12 +34,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 public class SetupProfile extends Activity {
 
      
+
+
 	private static final int RESULT_LOAD_IMAGE = 1;
+	private static final int DEFAULT_PROFILE = R.drawable.ic_launcher;
 	
 	private String email = null; 
 	private ImageButton profileImage;
@@ -48,9 +54,22 @@ public class SetupProfile extends Activity {
 	
 	private EditText firstBox, lastBox, locationBox;
 	private Spinner ageSpinner;
+	private RadioGroup genderGroup ;
 	private List<RadioButton> genderRadio = new ArrayList<RadioButton>();
 	
+
 	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		FlurryAgent.onStartSession(this, App.FLURRY_ID);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		FlurryAgent.onEndSession(this);
+	}
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +77,7 @@ public class SetupProfile extends Activity {
 		setContentView(R.layout.activity_setup_profile);
 
 		initViews();
-		profileURI = Uri.parse("android.resource://com.get.jacd/" + R.drawable.ic_launcher);
+		profileURI = Uri.parse("android.resource://com.get.jacd/" + DEFAULT_PROFILE);
 		
 		Intent intent = getIntent();
 		email = intent.getStringExtra("email"); 
@@ -103,9 +122,12 @@ public class SetupProfile extends Activity {
 		locationBox = (EditText) findViewById(R.id.text_location);
 		genderRadio.add((RadioButton) findViewById(R.id.radio_male));
 		genderRadio.add((RadioButton) findViewById(R.id.radio_female));
-
+		genderGroup = (RadioGroup) findViewById(R.id.gender_radio);
 		ageSpinner = (Spinner) findViewById(R.id.spinner_age);
 		profileImage = (ImageButton) findViewById(R.id.profile_image);
+		
+		profile = BitmapFactory.decodeResource(getResources(), DEFAULT_PROFILE);
+
 
 	}
 
@@ -188,12 +210,19 @@ public class SetupProfile extends Activity {
     	            
 					user.put("Image", new ParseFile(bitmap2ByteArray(profile)));
     	            user.put("Age", ageSpinner.getSelectedItemPosition());
-    	            user.put("Gender", (genderRadio.get(0).isChecked())?0:1 );
     	            
+    	            int selectedId = genderGroup.getCheckedRadioButtonId();    	            
+    	            user.put("Gender", (selectedId == R.id.radio_male) ?0:1 );
+    	            
+    	          
     	            user.saveInBackground(new SaveCallback() {
 						@Override
-						public void done(ParseException arg0) {
+						public void done(ParseException e) {
 							progress.dismiss();
+							if (e==null) 
+						        Toast.makeText(getApplication(), "Saved data successfully!", Toast.LENGTH_SHORT).show();
+							else
+						        Toast.makeText(getApplication(), "Data failed to save. Please try again.", Toast.LENGTH_SHORT).show();
 						}
 					});
     	        } 
@@ -309,5 +338,7 @@ public class SetupProfile extends Activity {
 		
 		return super.onOptionsItemSelected(item);
 	}
+	
+
 	
 }

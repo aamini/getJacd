@@ -2,6 +2,7 @@ package com.get.jacd;
 
 import java.util.List;
 
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 import com.parse.FindCallback;
@@ -39,6 +40,19 @@ public class SignIn extends Activity {
 	private final static int PICK_ACCOUNT_REQUEST = 1;
 	public final static String PREFS_NAME = "SIGN_IN_PREFRENCES";
 	private final static String PREF_EMAIL = "SAVED_EMAIL_ADDRESS";
+	
+	@Override
+	protected void onStart() {
+		super.onStart();
+		FlurryAgent.onStartSession(this, App.FLURRY_ID);
+	}
+	
+	@Override
+	protected void onStop() {
+		super.onStop();
+		FlurryAgent.onEndSession(this);
+	}
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +134,7 @@ public class SignIn extends Activity {
         Intent myIntent = new Intent(SignIn.this, SetupProfile.class);
         myIntent.putExtra("email", accountName); //Optional parameters
         SignIn.this.startActivity(myIntent);
+        Toast.makeText(getApplication(), "Signed in successfully!", Toast.LENGTH_SHORT).show();
         finish();	
         return;
 	}
