@@ -21,5 +21,6 @@
     <string name="female">Female</string>
     <string name="finish_profile">Save and Finish!</string>
     <string name="title_activity_create_group">Create Group</string>
+    <string name="title_activity_group_profile">Group Profile</string>
 
 </resources>

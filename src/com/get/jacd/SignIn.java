@@ -122,7 +122,7 @@ public class SignIn extends Activity {
     	progress.dismiss();
     	
         //start profile setup intent 
-        Intent myIntent = new Intent(SignIn.this, SetupProfile.class);
+        Intent myIntent = new Intent(SignIn.this, UserProfile.class);
         myIntent.putExtra("email", accountName); //Optional parameters
         SignIn.this.startActivity(myIntent);
         Toast.makeText(getApplication(), "Signed in successfully!", Toast.LENGTH_SHORT).show();

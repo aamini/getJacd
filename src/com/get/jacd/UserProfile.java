@@ -30,7 +30,6 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
@@ -46,10 +45,7 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class SetupProfile extends Activity {
-
-     
-
+public class UserProfile extends Activity {
 
 	private static final int RESULT_LOAD_IMAGE = 1;
 	private static final int DEFAULT_PROFILE = R.drawable.ic_launcher;
@@ -118,12 +114,12 @@ public class SetupProfile extends Activity {
 				locationButton.setVisibility(View.GONE);
 				pb.setVisibility(View.VISIBLE);
 				
-				final LocationManager locationManager = (LocationManager) SetupProfile.this.getSystemService(Context.LOCATION_SERVICE);
+				final LocationManager locationManager = (LocationManager) UserProfile.this.getSystemService(Context.LOCATION_SERVICE);
 
 				// Define a listener that responds to location updates
 				LocationListener locationListener = new LocationListener() {
 					public void onLocationChanged(Location location) {
-						Geocoder geoCoder = new Geocoder(SetupProfile.this,
+						Geocoder geoCoder = new Geocoder(UserProfile.this,
 								Locale.getDefault());
 						try {
 							List<Address> addresses = geoCoder.getFromLocation(location.getLatitude(),location.getLongitude(), 1);

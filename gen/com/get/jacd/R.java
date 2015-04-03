@@ -71,8 +71,9 @@ public final class R {
     }
     public static final class layout {
         public static final int activity_create_group=0x7f030000;
-        public static final int activity_setup_profile=0x7f030001;
-        public static final int activity_sign_in=0x7f030002;
+        public static final int activity_group_profile=0x7f030001;
+        public static final int activity_setup_profile=0x7f030002;
+        public static final int activity_sign_in=0x7f030003;
     }
     public static final class menu {
         public static final int create_group=0x7f070000;
@@ -97,6 +98,7 @@ public final class R {
         public static final int navigation_drawer_close=0x7f050005;
         public static final int navigation_drawer_open=0x7f050004;
         public static final int title_activity_create_group=0x7f050013;
+        public static final int title_activity_group_profile=0x7f050014;
         public static final int title_activity_setup_profile=0x7f05000a;
         public static final int title_activity_sign_in=0x7f050008;
         public static final int title_section1=0x7f050001;
