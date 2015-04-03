@@ -54,7 +54,7 @@ public class SetupProfile extends Activity {
 	private static final int RESULT_LOAD_IMAGE = 1;
 	private static final int DEFAULT_PROFILE = R.drawable.ic_launcher;
 	
-	private String email = null; 
+	private String USER_EMAIL = null; 
 	private ImageButton profileImage,locationButton;
 	private Bitmap profile;
 	private Uri profileURI;
@@ -87,7 +87,7 @@ public class SetupProfile extends Activity {
 		profileURI = Uri.parse("android.resource://com.get.jacd/" + DEFAULT_PROFILE);
 		
 		Intent intent = getIntent();
-		email = intent.getStringExtra("email"); 
+		USER_EMAIL = intent.getStringExtra("email"); 
 		
 		// Application of the Array to the Spinner
 		String[] ages = new String[100];
@@ -128,10 +128,10 @@ public class SetupProfile extends Activity {
 						try {
 							List<Address> addresses = geoCoder.getFromLocation(location.getLatitude(),location.getLongitude(), 1);
 							Address address = addresses.get(0);
-							locationBox.setText(address.getLocality()+ ", "+address.getAdminArea()+" "+address.getPostalCode());
+							String zip = (address.getPostalCode()==null)?address.getPostalCode():"";
+							locationBox.setText(address.getLocality()+ ", "+address.getAdminArea()+" "+zip);
 						} catch (IOException e) {
 						} catch (NullPointerException e) {}
-
 
 						locationButton.setVisibility(View.VISIBLE);
 						pb.setVisibility(View.GONE);
@@ -203,7 +203,7 @@ public class SetupProfile extends Activity {
     	progress.show();
     	
     	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-    	query.whereEqualTo("Email", email);
+    	query.whereEqualTo("Email", USER_EMAIL);
     	query.findInBackground(new FindCallback<ParseObject>() {
     	    public void done(List<ParseObject> users, ParseException e) {
     	        if (e == null) {
@@ -248,7 +248,7 @@ public class SetupProfile extends Activity {
     	progress.show();
     	
     	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-    	query.whereEqualTo("Email", email);
+    	query.whereEqualTo("Email", USER_EMAIL);
     	query.findInBackground(new FindCallback<ParseObject>() {
     	    public void done(List<ParseObject> users, ParseException e) {
     	        if (e == null) { //no error

@@ -23,9 +23,9 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,6 +37,10 @@
             android:name=".SetupProfile"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_setup_profile" >
+        </activity>
+        <activity
+            android:name=".CreateGroup"
+            android:label="@string/title_activity_create_group" >
         </activity>
     </application>
 

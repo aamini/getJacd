@@ -125,7 +125,7 @@
             android:layout_weight="1"
             android:ems="10"
             android:hint="@string/location"
-            android:inputType="textPostalAddress" />
+            android:inputType="textPostalAddress|textMultiLine" />
 
         <ImageButton
             android:id="@+id/button_get_location_profile"
