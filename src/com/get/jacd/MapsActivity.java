@@ -48,7 +48,7 @@ public class MapsActivity extends FragmentActivity {
     double longitude = 0;
     //private Marker currentMarker; //Current location marker of user
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
-    List<String> filteredGroups = new ArrayList<String>();
+    List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
 
     @Override
     protected void onStart() {
@@ -175,7 +175,7 @@ public class MapsActivity extends FragmentActivity {
                user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
                try {
                 user.save();
-                Log.d("test","latitude: "+ latitude +" longitude:  " + longitude);
+                //Log.d("test","latitude: "+ latitude +" longitude:  " + longitude);
             } catch (ParseException e1) {
                 // TODO Auto-generated catch block
                 e1.printStackTrace();
@@ -198,15 +198,18 @@ public class MapsActivity extends FragmentActivity {
         //get user locations from groups
         int colorCounter=0;
         for(String groupName:filteredGroups) {
+            Log.d("testing","INSIDE GROUP LOOP");
             List<String> groupUserList = getUserList(groupName);
+            Log.d("testing2","UserList: " + groupUserList);
             List<LatLng> userLocationList = new ArrayList<LatLng>();
+            Log.d("testing3","userLocationList: "+userLocationList);
             for(String username:groupUserList)
             {
                 LatLng loc = getUserLocation(username);
                 userLocationList.add(loc);
             }
             addMarkers(colorCounter % 360, userLocationList);
-            colorCounter+=10;
+            colorCounter+=30;
         }
 
     }
@@ -214,6 +217,7 @@ public class MapsActivity extends FragmentActivity {
     public void addMarkers(float hue, List<LatLng> points){
         for(LatLng i:points){
             //TODO: change icon for marker
+            Log.d("test2","latitude: " +i.latitude + "longitude: " + i.longitude);
             mMap.addMarker(new MarkerOptions().position(i).title("Username?").
                           icon(BitmapDescriptorFactory.defaultMarker(hue)));
         }
@@ -231,16 +235,57 @@ public class MapsActivity extends FragmentActivity {
     }
     
    //retrieve usernames from within group and return as list
+    //TODO: make sure groups and users end up being unique on parse
     private List<String> getUserList(String group){
         List<String> userList = new ArrayList<String>();
-        //TODO: HERE USING GROUP STRING GRAB LIST FROM PARSE
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Groups");
+        query.whereEqualTo("Name", group);
+        //TODO: deal with asynchronity
+        ParseObject matchingGroup;
+        try {
+            matchingGroup = query.find().get(0);
+            userList = matchingGroup.getList("Members");
+            Log.d("testing4","Members List: "+ userList);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        /*List<String> tempList = new ArrayList<String>();
+        tempList = matchingGroup.getList("Members");*/
+       
+       /* for(String user:tempList)
+        {
+            Log.d("testing5","users in list: " + user);
+            userList.add(user);
+        }*/
+        //TODO: handle exceptions
         return userList;
     }
     //retrieve location from server given a username
     private LatLng getUserLocation(String username){
+        //final List<LatLng> userLocations = new ArrayList<LatLng>();
         double lat = 0;
         double lon= 0;
-        //TODO: Get latitude and Longitude from server through parse
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        query.whereEqualTo("Email", username);
+        try {
+            ParseObject user=query.find().get(0);
+            ParseGeoPoint loc = user.getParseGeoPoint("CurrentLocation");
+            lat = loc.getLatitude();
+            lon = loc.getLongitude();
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        /*query.findInBackground(new FindCallback<ParseObject>() {
+            public void done(List<ParseObject> users, ParseException e) {
+              if (e == null) {
+                ParseObject user=users.get(0);
+                ParseGeoPoint loc = user.getParseGeoPoint("CurrentLocation");
+                userLocations.add(new LatLng(loc.getLatitude(),loc.getLongitude()));
+              }
+            }
+          });*/
         return new LatLng(lat,lon);
     }
 }
