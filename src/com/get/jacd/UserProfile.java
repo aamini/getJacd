@@ -213,8 +213,11 @@ public class UserProfile extends Activity {
 						byte[] arr = user.getParseFile("Image").getData();
 						profile = byteArray2Bitmap(arr);
 	    	            profileImage.setImageBitmap(profile);
-					} catch (ParseException|NullPointerException e1) {
+					} catch (ParseException e1) {
 						e1.printStackTrace();
+					}
+					catch(NullPointerException e2){
+					    e2.printStackTrace();
 					}
 
     	            int gender = user.getInt("Gender");
