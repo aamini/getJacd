@@ -10,6 +10,8 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.widget.Toast;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.maps.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +30,10 @@ import java.util.Random;
 
 import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.SaveCallback;
@@ -39,9 +44,11 @@ public class MapsActivity extends FragmentActivity {
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private String USER_EMAIL = null;
     Location lastLocation;
+    double latitude = 0;
+    double longitude = 0;
     //private Marker currentMarker; //Current location marker of user
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
-    List<String> filteredGroups;
+    List<String> filteredGroups = new ArrayList<String>();
 
     @Override
     protected void onStart() {
@@ -110,18 +117,17 @@ public class MapsActivity extends FragmentActivity {
 
 
         setCurrentMarkerPosition();
+        
 
-        //TODO: Check that this is working correctly -refreshing every 3 seconds
         final Handler handler = new Handler();
         final Runnable update = new Runnable(){
             @Override
             public void run(){
                 updateMarkers();
-                handler.postDelayed(this,3000);
+                handler.postDelayed(this,7000);
             }
-
         };
-
+       handler.postDelayed(update,5000);
 
 
     }
@@ -141,12 +147,10 @@ public class MapsActivity extends FragmentActivity {
        String provider = locationManager.getBestProvider(criteria, true);
 
        // Get Current Location
-       Location myLocation = locationManager.getLastKnownLocation(provider);
+       Location myLocation = locationManager.getLastKnownLocation(provider);//TODO: use different function to get location
        lastLocation = myLocation;
        // set map type
        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-       double latitude = 0;
-       double longitude = 0;
        if(myLocation!=null) {
             // Get latitude of the current location
             latitude = myLocation.getLatitude();
@@ -162,14 +166,34 @@ public class MapsActivity extends FragmentActivity {
        // Zoom in the Google Map
        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
        //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-       //TODO: send personal location to server -parse
        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+       query.whereEqualTo("Email", USER_EMAIL);
+       query.findInBackground(new FindCallback<ParseObject>() {
+           public void done(List<ParseObject> users, ParseException e) {
+             if (e == null) {
+               ParseObject user=users.get(0);
+               user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
+               try {
+                user.save();
+                Log.d("test","latitude: "+ latitude +" longitude:  " + longitude);
+            } catch (ParseException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+               //TODO: handle exceptions
+             }
+           }
+         });
+     
+       
+       
        
    }
 
 //TODO: formalize datatypes for username and group name to stop passing so many strings around
     private void updateMarkers(){
         mMap.clear();
+        //TODO: change map clear to just remove markers ->
         setCurrentMarkerPosition();
         //get user locations from groups
         int colorCounter=0;
@@ -200,10 +224,12 @@ public class MapsActivity extends FragmentActivity {
     {
         filteredGroups.add(group);
     }
+    
     //removes group name from filtered groups
     public void removeFilter(String group){
         filteredGroups.remove(group);
     }
+    
    //retrieve usernames from within group and return as list
     private List<String> getUserList(String group){
         List<String> userList = new ArrayList<String>();

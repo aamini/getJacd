@@ -236,6 +236,10 @@ public class UserProfile extends Activity {
     	if (isNetworkAvailable())
 	    	saveProfileToParse();
     		//TODO: Move onto Main Map
+    	    Intent myIntent = new Intent(UserProfile.this, MapsActivity.class);
+    	    myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+    	    UserProfile.this.startActivity(myIntent);
+    	    finish();
     }
     
     
