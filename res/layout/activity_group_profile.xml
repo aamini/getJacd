@@ -1,12 +1,132 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" 
+		android:padding="10dp">
+        <!-- NAME -->
 
-</RelativeLayout>
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:paddingRight="10dp"
+                android:text="Name"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/group_profile_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Name goes here"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>
+
+        <!-- VISIBILITY -->
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:paddingRight="10dp"
+                android:text="Public?"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/group_profile_visible"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Visibility goes here"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>
+
+        <!-- Location -->
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:paddingRight="10dp"
+                android:text="Location"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/group_profile_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Location goes here"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>
+
+        <!-- DESCRIPTION -->
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:paddingRight="10dp"
+                android:text="Description"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <TextView
+                android:id="@+id/group_profile_description"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Description goes here"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+        </TableRow>
+
+        <!-- MEMBERS -->
+
+        <TableRow
+            android:id="@+id/group_profile_members_row"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dip" >
+
+            <TextView
+                android:paddingRight="10dp"
+                android:text="Members"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            <ListView
+                android:id="@+id/group_profile_members_list"
+                android:layout_width="wrap_content"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:scrollbars="vertical" >
+            </ListView>
+        </TableRow>
+    </TableLayout>
+
+    <Button
+        android:id="@+id/group_profile_add_user_button"
+        android:layout_width="153dp"
+        android:layout_height="75dp"
+        android:text="Add a Friend" />
+
+    <Button
+        android:id="@+id/group_profile_toggle_member_button"
+        android:layout_width="100dp"
+        android:layout_height="75dp"
+        android:text="Join" />
+
+</LinearLayout>

@@ -101,7 +101,12 @@ public class SignIn extends Activity {
 				user.put("Email", accountName);
 				user.save();
 			} else { //user already exists
-				//TODO: move to map
+				//TODO: move directly to map
+				Intent myIntent = new Intent(SignIn.this, MapsActivity.class);
+	    	    myIntent.putExtra("email", accountName); //Optional parameters
+	    	    SignIn.this.startActivity(myIntent);
+	    	    finish();
+	    	    return;
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();

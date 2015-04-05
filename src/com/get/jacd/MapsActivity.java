@@ -21,7 +21,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.maps.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -203,15 +202,14 @@ public class MapsActivity extends FragmentActivity {
             Log.d("testing2","UserList: " + groupUserList);
             List<LatLng> userLocationList = new ArrayList<LatLng>();
             Log.d("testing3","userLocationList: "+userLocationList);
-            for(String username:groupUserList)
+            for(String username:groupUserList) 
             {
                 LatLng loc = getUserLocation(username);
                 userLocationList.add(loc);
             }
             addMarkers(colorCounter % 360, userLocationList);
-            colorCounter+=30;
-        }
-
+            colorCounter+=30; 
+        } 
     }
     //Add markers to all the point in the list using the color given
     public void addMarkers(float hue, List<LatLng> points){

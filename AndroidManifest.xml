@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
@@ -21,14 +21,13 @@
         android:icon="@drawable/gj_logo"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo" >
-        
-            <meta-data
+        <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-    		<meta-data
-            android:name="com.google.android.maps.v2.API_KEY"
-            android:value="@string/google_api_key" />
-    		
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBzfqACmE1QnZWmf215WLLwN1KBX70qOWs" />
+
         <activity
             android:name=".SignIn"
             android:label="@string/app_name"
@@ -59,8 +58,11 @@
         </activity>
         <activity
             android:name=".MapsActivity"
-            android:label="Map" >
-			
+            android:label="Get Jac&apos;d!" >
+        </activity>
+        <activity
+            android:name=".SearchGroups"
+            android:label="Search" >
         </activity>
     </application>
 
