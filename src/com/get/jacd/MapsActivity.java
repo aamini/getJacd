@@ -116,7 +116,7 @@ public class MapsActivity extends FragmentActivity {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
 
 
-        setCurrentMarkerPosition();
+        setCurrentMarkerPosition(true);
         
 
         final Handler handler = new Handler();
@@ -134,7 +134,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     //Draws blue marker where user currently is
-   private void setCurrentMarkerPosition(){
+   private void setCurrentMarkerPosition(boolean setup){
        // Enable MyLocation Layer of Google Map
        mMap.setMyLocationEnabled(true);
        // Get LocationManager object from System Service LOCATION_SERVICE
@@ -160,12 +160,14 @@ public class MapsActivity extends FragmentActivity {
        // Create a LatLng object for the current location
        LatLng latLng = new LatLng(latitude, longitude);
 
+       if(setup){
        // Show the current location in Google Map
        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
        // Zoom in the Google Map
        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
        //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+       }
        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
        query.whereEqualTo("Email", USER_EMAIL);
        query.findInBackground(new FindCallback<ParseObject>() {
@@ -194,7 +196,7 @@ public class MapsActivity extends FragmentActivity {
     private void updateMarkers(){
         mMap.clear();
         //TODO: change map clear to just remove markers ->
-        setCurrentMarkerPosition();
+        setCurrentMarkerPosition(false);
         //get user locations from groups
         int colorCounter=0;
         for(String groupName:filteredGroups) {
