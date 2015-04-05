@@ -48,6 +48,7 @@ public class MapsActivity extends FragmentActivity {
     //private Marker currentMarker; //Current location marker of user
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
     List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
+    List<Marker> markers = new ArrayList<Marker>();
 
     @Override
     protected void onStart() {
@@ -115,7 +116,7 @@ public class MapsActivity extends FragmentActivity {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
 
 
-        setCurrentMarkerPosition();
+        setCurrentMarkerPosition(true);
         
 
         final Handler handler = new Handler();
@@ -133,7 +134,7 @@ public class MapsActivity extends FragmentActivity {
 
 
     //Draws blue marker where user currently is
-   private void setCurrentMarkerPosition(){
+   private void setCurrentMarkerPosition(boolean setup){
        // Enable MyLocation Layer of Google Map
        mMap.setMyLocationEnabled(true);
        // Get LocationManager object from System Service LOCATION_SERVICE
@@ -159,12 +160,14 @@ public class MapsActivity extends FragmentActivity {
        // Create a LatLng object for the current location
        LatLng latLng = new LatLng(latitude, longitude);
 
+       if(setup){
        // Show the current location in Google Map
        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
        // Zoom in the Google Map
        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
        //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+       }
        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
        query.whereEqualTo("Email", USER_EMAIL);
        query.findInBackground(new FindCallback<ParseObject>() {
@@ -191,9 +194,13 @@ public class MapsActivity extends FragmentActivity {
 
 //TODO: formalize datatypes for username and group name to stop passing so many strings around
     private void updateMarkers(){
-        mMap.clear();
+        //mMap.clear();
+        for(Marker mark: markers)
+        {
+            mark.remove();
+        }
         //TODO: change map clear to just remove markers ->
-        setCurrentMarkerPosition();
+        setCurrentMarkerPosition(false);
         //get user locations from groups
         int colorCounter=0;
         for(String groupName:filteredGroups) {
@@ -216,8 +223,8 @@ public class MapsActivity extends FragmentActivity {
         for(LatLng i:points){
             //TODO: change icon for marker
             Log.d("test2","latitude: " +i.latitude + "longitude: " + i.longitude);
-            mMap.addMarker(new MarkerOptions().position(i).title("Username?").
-                          icon(BitmapDescriptorFactory.defaultMarker(hue)));
+            markers.add(mMap.addMarker(new MarkerOptions().position(i).title("Username?").
+                          icon(BitmapDescriptorFactory.defaultMarker(hue))));
         }
     }
 
