@@ -2,6 +2,7 @@ package com.get.jacd;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -156,40 +157,49 @@ public class CreateGroup extends Activity {
     	            	progress.dismiss(); //get rid of loading dialog
     	            	
     	            	//start alert dialog 
-    	            	new AlertDialog.Builder(CreateGroup.this)
-    	                .setTitle("Save Error!")
-    	                .setMessage("A group with this name already exists.\nPlease pick a different name.")
-    	                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-    	                	public void onClick(DialogInterface dialog, int which) {}
-    	                })
-    	                .setCancelable(false)
-    	                .setIcon(android.R.drawable.ic_dialog_alert)
-    	                .show();
-    	            	
+    	            	new CustomAlertDialog(
+    	            			getApplicationContext(), 
+    	            			"A group with this name already exists.\nPlease pick a different name.")
+    	            	.show();
     	            	return;
     	            }
     	            
     	            //group does not exist so add it
     	            ParseObject group = new ParseObject("Groups");
     	            group.put("Name", name.getText().toString());
-    	            group.put("Members", new ArrayList<String>());
+    	            group.put("Members", new ArrayList<String>(Arrays.asList(USER_EMAIL)));
     	            group.put("ScheduledRuns", new ArrayList<String>());
     	            group.put("Public", privacy.getCheckedRadioButtonId()==R.id.radio_public);
     	            group.put("Location", location.getText().toString());
     	            group.put("Description", description.getText().toString());
 
-    	            group.saveInBackground(new SaveCallback() {
-						@Override
-						public void done(ParseException e) {
-							progress.dismiss();
-							if (e==null) 
-						        Toast.makeText(getApplication(), "New Group: "+name.getText()+" created!", Toast.LENGTH_SHORT).show();
-							else
-						        Toast.makeText(getApplication(), "Data failed to save. Please try again.", Toast.LENGTH_SHORT).show();
-						}
-					});
-    	        } else {
-			        Log.e("error","amini",e);
+    	            try {
+	    	        	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+	    	        	query.whereEqualTo("Email", USER_EMAIL);
+	    	        	ParseObject u = query.find().get(0);
+	    	        	List<String> g = u.getList("Groups");
+	    	        	if (!g.contains(name.getText().toString()))
+	    	        			g.add(name.getText().toString());
+	    	        	u.put("Groups",g);
+	    	        	u.save();
+						
+						group.save();
+						
+						Toast.makeText(getApplication(), "New Group: "+name.getText()+" created!", Toast.LENGTH_SHORT).show();
+						
+						progress.dismiss();
+						Intent myIntent = new Intent(CreateGroup.this, GroupProfile.class);
+		                myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+		                myIntent.putExtra("group", name.getText().toString());
+		                CreateGroup.this.startActivity(myIntent);
+		            	finish();
+					} catch (ParseException e1) {
+    	            	new CustomAlertDialog(
+    	            			getApplicationContext(), 
+    	            			"Error saving group. Details: "+e.getMessage())
+    	            	.show();
+					}
+    	            progress.dismiss();
     	        }
     	    }
     	});

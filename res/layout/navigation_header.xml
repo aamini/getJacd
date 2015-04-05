@@ -14,42 +14,49 @@
     <!-- Rightend Arrow -->
     <!-- Base text -->
 
-    <ImageView
-        android:id="@+id/image_header_user_profile"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:paddingRight="10dp"
-        android:src="@drawable/ic_launcher" />
+	<RelativeLayout
+	    android:id="@+id/rlprofile"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content" >
 
-    <TextView
-        android:id="@+id/text_header_user_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/image_header_user_profile"
-        android:paddingBottom="10dp"
-        android:paddingRight="10dp"
-        android:text="First Last"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="#ffffff" />
+	    <ImageView
+	        android:id="@+id/image_header_user_profile"
+	        android:layout_width="90dp"
+	        android:layout_height="match_parent"
+	        android:layout_alignParentLeft="true"
+	        android:layout_alignParentTop="true"
+	        android:background="@null"
+	        android:paddingRight="10dp"
+	        android:scaleType="fitCenter"
+	        android:src="@drawable/ic_launcher" />
 
-    <TextView
-        android:id="@+id/text_header_user_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text_header_user_name"
-        android:layout_toRightOf="@+id/image_header_user_profile"
-        android:paddingBottom="5dp"
-        android:text="first.last@email.com"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="#ffffff" />
+	    <TextView
+	        android:id="@+id/text_header_user_name"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@+id/image_header_user_profile"
+	        android:paddingBottom="2dp"
+	        android:paddingRight="10dp"
+	        android:text="First Last"
+	        android:textAppearance="?android:attr/textAppearanceMedium"
+	        android:textColor="#ffffff" />
+
+	    <TextView
+	        android:id="@+id/text_header_user_email"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/text_header_user_name"
+	        android:layout_toRightOf="@+id/image_header_user_profile"
+	        android:paddingBottom="5dp"
+	        android:text="first.last@email.com"
+	        android:textAppearance="?android:attr/textAppearanceSmall"
+	        android:textColor="#ffffff" />
+	</RelativeLayout>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="1dp"
-        android:layout_below="@+id/text_header_user_email"
+        android:layout_below="@+id/rlprofile"
         android:background="@android:color/darker_gray"
         android:paddingTop="5dp"
         android:paddingBottom="10dp" />

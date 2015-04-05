@@ -3,6 +3,7 @@ package com.get.jacd;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -19,9 +20,11 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.os.Bundle;
@@ -65,11 +68,15 @@ public class MapsActivity extends FragmentActivity {
     List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
     List<Marker> markers = new ArrayList<Marker>();
     
-    //Navigation drawer variables
+    //Navigation drawer views
     private DrawerLayout drawerLayout;
     private LinearLayout drawerLinear;
     private ListView drawerList;
 	private ActionBarDrawerToggle drawerToggle;
+	private ImageView drawerProfile;
+	private TextView drawerName, drawerEmail;
+	private LinearLayout tableLayout;
+	private List<CheckBox> groupCheckBoxes = new ArrayList<CheckBox>();
 
     @Override
     protected void onStart() {
@@ -196,22 +203,23 @@ public class MapsActivity extends FragmentActivity {
        }
        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
        query.whereEqualTo("Email", USER_EMAIL);
-       query.findInBackground(new FindCallback<ParseObject>() {
-           public void done(List<ParseObject> users, ParseException e) {
-             if (e == null) {
-               ParseObject user=users.get(0);
-               user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
-               try {
-                user.save();
-                //Log.d("test","latitude: "+ latitude +" longitude:  " + longitude);
-            } catch (ParseException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-               //TODO: handle exceptions
-             }
-           }
-         });
+		query.findInBackground(new FindCallback<ParseObject>() {
+			public void done(List<ParseObject> users, ParseException e) {
+				if (e == null) {
+					ParseObject user = users.get(0);
+					user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
+					try {
+						user.save();
+						// Log.d("test","latitude: "+ latitude +" longitude:  "
+						// + longitude);
+					} catch (ParseException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					// TODO: handle exceptions
+				}
+			}
+		});
      
        
        
@@ -332,7 +340,19 @@ public class MapsActivity extends FragmentActivity {
                 R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
                 R.string.drawer_open,  /* "open drawer" description */
                 R.string.drawer_close  /* "close drawer" description */
-                ) {};
+                ) {
+        	@Override
+        	public void onDrawerClosed(View view) {
+				super.onDrawerClosed(view);
+				// update drawer every time it is closed
+				refreshSideBar();
+			}
+
+			@Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+            }
+        };
         
         drawerLayout.setDrawerListener(drawerToggle);
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -343,40 +363,73 @@ public class MapsActivity extends FragmentActivity {
         View header = getLayoutInflater().inflate(R.layout.navigation_header, null);
         drawerList.addHeaderView(header, null, false);
         
+        drawerName = (TextView) findViewById(R.id.text_header_user_name);
+        drawerEmail = (TextView) findViewById(R.id.text_header_user_email);
+        drawerProfile = (ImageView) findViewById(R.id.image_header_user_profile);
+		tableLayout = (LinearLayout) findViewById(R.id.navigation_linear_table);
+
         ObjectDrawerItem[] items = new ObjectDrawerItem[2];
         items[0] = new ObjectDrawerItem(android.R.drawable.ic_menu_search, "Search");
         items[1] = new ObjectDrawerItem(android.R.drawable.ic_menu_add, "Create");
 
         DrawerItemCustomAdapter adapter = new DrawerItemCustomAdapter(this, R.layout.listview_item_row, items);
         drawerList.setAdapter(adapter);
-        
-        LinearLayout tableLayout = (LinearLayout)findViewById(R.id.navigation_linear_table);
-        List<String> groups = new ArrayList<String>(Arrays.asList("Group1","Test Group"));
-        for (String group: groups) {        	
-        	TableRow row = new TableRow(this);
-            row.setId(groups.indexOf(group));
-            row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
-            CheckBox checkBox = new CheckBox(this);
-            checkBox.setOnCheckedChangeListener(checkBoxListener);
-            checkBox.setId(groups.indexOf(group));
-            checkBox.setText(group);
-            checkBox.setTextSize(20);   
-            checkBox.setTextColor(Color.WHITE);
-            row.addView(checkBox);  
-            tableLayout.addView(row);
-        }
-        
-        
+                
         header.setOnClickListener(headerListener);
         drawerList.setOnItemClickListener(drawerListListener);
         drawerLayout.closeDrawer(drawerLinear);		
+		refreshSideBar();
 	}
     
+	private void updateTableView(List<String> groups) {
+		groupCheckBoxes.clear();
+		tableLayout.removeAllViews();
+		
+		for (String group : groups) {
+			TableRow row = new TableRow(this);
+			row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+					LayoutParams.WRAP_CONTENT));
+			
+			CheckBox checkBox = new CheckBox(this);
+			checkBox.setOnCheckedChangeListener(checkBoxListener);
+			checkBox.setId(groups.indexOf(group));
+			checkBox.setText(group);
+			checkBox.setTextSize(20);
+			checkBox.setTextColor(Color.WHITE);
+			
+			groupCheckBoxes.add(checkBox);
+			row.addView(checkBox);
+			tableLayout.addView(row);
+		}
+	}
+	
+	private void refreshSideBar() {
+		try {
+			ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+
+			query.whereEqualTo("Email", USER_EMAIL);
+			ParseObject user = query.find().get(0);
+
+			drawerName.setText(user.getString("First") +" "+ user.getString("Last"));
+			drawerEmail.setText(user.getString("Email"));
+
+			byte[] arr = user.getParseFile("Image").getData();
+			drawerProfile.setImageBitmap(BitmapFactory.decodeByteArray(arr, 0,arr.length));
+
+			List<String> list = user.getList("Groups");
+			updateTableView(list);
+		} catch (ParseException e) {}
+
+	}
+
 	OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
 		@Override
-		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-			Toast.makeText(getApplicationContext(), buttonView.getId()+" checked="+isChecked, Toast.LENGTH_SHORT).show();
-            
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) {
+			Toast.makeText(getApplicationContext(),
+					buttonView.getId() + " checked=" + isChecked,
+					Toast.LENGTH_SHORT).show();
+
 		}
 	};
     
@@ -384,10 +437,18 @@ public class MapsActivity extends FragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> av, View v, int pos, long arg3) {
             Toast.makeText(getApplicationContext(), "clicked: "+pos, Toast.LENGTH_SHORT).show();
+            
+            Intent myIntent;
             switch (pos) {
-            case 0: //search
+            case 1: //search
+                myIntent = new Intent(MapsActivity.this, SearchGroups.class);
+                myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+                MapsActivity.this.startActivity(myIntent);
             	break;
-            case 1: //create 
+            case 2: //create 
+                myIntent = new Intent(MapsActivity.this, CreateGroup.class);
+                myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+                MapsActivity.this.startActivity(myIntent);
             	break;
             }
             drawerList.setItemChecked(pos, false);
@@ -398,8 +459,15 @@ public class MapsActivity extends FragmentActivity {
     View.OnClickListener headerListener = new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
+            drawerLayout.closeDrawer(drawerLinear);
+
             Toast.makeText(getApplicationContext(), "clicked: header", Toast.LENGTH_SHORT).show();
             //go to user profile
+            Intent myIntent = new Intent(MapsActivity.this, UserProfile.class);
+            myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+            myIntent.putExtra("finishAfter",true);
+
+            MapsActivity.this.startActivity(myIntent);
 		}
 	};
 	

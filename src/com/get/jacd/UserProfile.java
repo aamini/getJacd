@@ -233,13 +233,9 @@ public class UserProfile extends Activity {
     }
     
     private void finishProfile() {
-    	if (isNetworkAvailable())
+    	if (isNetworkAvailable()) {
 	    	saveProfileToParse();
-    		//TODO: Move onto Main Map
-    	    Intent myIntent = new Intent(UserProfile.this, MapsActivity.class);
-    	    myIntent.putExtra("email", USER_EMAIL); //Optional parameters
-    	    UserProfile.this.startActivity(myIntent);
-    	    finish();
+    	}
     }
     
     
@@ -271,15 +267,27 @@ public class UserProfile extends Activity {
 						@Override
 						public void done(ParseException e) {
 							progress.dismiss();
-							if (e==null) 
+							if (e==null) {
 						        Toast.makeText(getApplication(), "Saved data successfully!", Toast.LENGTH_SHORT).show();
-							else
+						    	if (getIntent().getBooleanExtra("finishAfter",false)==true) {
+						    		finish();
+						    		return;
+						    	}
+						    	
+					    	    Intent myIntent = new Intent(UserProfile.this, MapsActivity.class);
+					    	    myIntent.putExtra("email", USER_EMAIL); //Optional parameters
+					    	    UserProfile.this.startActivity(myIntent);
+					    	    finish();
+					    	    return;
+							
+							} else
 						        Toast.makeText(getApplication(), "Data failed to save. Please try again.", Toast.LENGTH_SHORT).show();
 						}
 					});
     	        } 
     	    }
     	});
+    	progress.dismiss();
 	}
     
 

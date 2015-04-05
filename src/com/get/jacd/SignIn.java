@@ -91,27 +91,6 @@ public class SignIn extends Activity {
     	progress.setCancelable(false);
     	progress.show();
     	
-    	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-    	query.whereEqualTo("Email", accountName);
-    	try {
-			List<ParseObject> users = query.find();
-
-			if (users.size()==0) { //new user
-				ParseObject user = new ParseObject("User");
-				user.put("Email", accountName);
-				user.save();
-			} else { //user already exists
-				//TODO: move directly to map
-				Intent myIntent = new Intent(SignIn.this, MapsActivity.class);
-	    	    myIntent.putExtra("email", accountName); //Optional parameters
-	    	    SignIn.this.startActivity(myIntent);
-	    	    finish();
-	    	    return;
-			}
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
-    	
     	if (rememberMe) {
     		getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
     		.edit()
@@ -123,6 +102,29 @@ public class SignIn extends Activity {
     		.clear()
     		.commit();
     	}
+    	
+    	ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+    	query.whereEqualTo("Email", accountName);
+    	try {
+			List<ParseObject> users = query.find();
+
+			if (users.size()==0) { //new user
+				ParseObject user = new ParseObject("User");
+				user.put("Email", accountName);
+				user.save();
+			} else { //user already exists
+				//TODO: move directly to map
+	        	progress.dismiss();
+
+				Intent myIntent = new Intent(SignIn.this, MapsActivity.class);
+	    	    myIntent.putExtra("email", accountName); //Optional parameters
+	    	    SignIn.this.startActivity(myIntent);
+	    	    finish();
+	    	    return;
+			}
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
     	
     	progress.dismiss();
     	
