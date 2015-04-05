@@ -49,6 +49,7 @@ public class MapsActivity extends FragmentActivity {
     //private Marker currentMarker; //Current location marker of user
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
     List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
+    List<Marker> markers = new ArrayList<Marker>();
 
     @Override
     protected void onStart() {
@@ -194,7 +195,11 @@ public class MapsActivity extends FragmentActivity {
 
 //TODO: formalize datatypes for username and group name to stop passing so many strings around
     private void updateMarkers(){
-        mMap.clear();
+        //mMap.clear();
+        for(Marker mark: markers)
+        {
+            mark.remove();
+        }
         //TODO: change map clear to just remove markers ->
         setCurrentMarkerPosition(false);
         //get user locations from groups
@@ -220,8 +225,8 @@ public class MapsActivity extends FragmentActivity {
         for(LatLng i:points){
             //TODO: change icon for marker
             Log.d("test2","latitude: " +i.latitude + "longitude: " + i.longitude);
-            mMap.addMarker(new MarkerOptions().position(i).title("Username?").
-                          icon(BitmapDescriptorFactory.defaultMarker(hue)));
+            markers.add(mMap.addMarker(new MarkerOptions().position(i).title("Username?").
+                          icon(BitmapDescriptorFactory.defaultMarker(hue))));
         }
     }
 
