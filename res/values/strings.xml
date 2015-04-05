@@ -23,4 +23,7 @@
     <string name="title_activity_create_group">Create Group</string>
     <string name="title_activity_group_profile">Group Profile</string>
 
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
 </resources>

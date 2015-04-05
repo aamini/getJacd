@@ -1,17 +1,29 @@
 package com.get.jacd;
 
-
-
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TableRow;
 import android.widget.Toast;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -27,6 +39,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import com.get.jacd.R;
+import com.get.jacd.DrawerItemCustomAdapter;
+import com.get.jacd.ObjectDrawerItem;
 import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
 import com.parse.Parse;
@@ -49,6 +64,12 @@ public class MapsActivity extends FragmentActivity {
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
     List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
     List<Marker> markers = new ArrayList<Marker>();
+    
+    //Navigation drawer variables
+    private DrawerLayout drawerLayout;
+    private LinearLayout drawerLinear;
+    private ListView drawerList;
+	private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onStart() {
@@ -65,13 +86,18 @@ public class MapsActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_activity_test);
+        setContentView(R.layout.activity_main);
+        
         Intent intent = getIntent();
         USER_EMAIL = intent.getStringExtra("email"); 
+        
+        setupNavigationDrawer();
+        
         setUpMapIfNeeded();
     }
 
-    @Override
+
+	@Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
@@ -293,4 +319,110 @@ public class MapsActivity extends FragmentActivity {
           });*/
         return new LatLng(lat,lon);
     }
+    
+    
+    private void setupNavigationDrawer() {
+        // R.id.drawer_layout should be in every activity with exactly the same id.
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLinear = (LinearLayout) findViewById(R.id.navigation_layout);
+
+        drawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                drawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+                ) {};
+        
+        drawerLayout.setDrawerListener(drawerToggle);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        View header = getLayoutInflater().inflate(R.layout.navigation_header, null);
+        drawerList.addHeaderView(header, null, false);
+        
+        ObjectDrawerItem[] items = new ObjectDrawerItem[2];
+        items[0] = new ObjectDrawerItem(android.R.drawable.ic_menu_search, "Search");
+        items[1] = new ObjectDrawerItem(android.R.drawable.ic_menu_add, "Create");
+
+        DrawerItemCustomAdapter adapter = new DrawerItemCustomAdapter(this, R.layout.listview_item_row, items);
+        drawerList.setAdapter(adapter);
+        
+        LinearLayout tableLayout = (LinearLayout)findViewById(R.id.navigation_linear_table);
+        List<String> groups = new ArrayList<String>(Arrays.asList("Group1","Test Group"));
+        for (String group: groups) {        	
+        	TableRow row = new TableRow(this);
+            row.setId(groups.indexOf(group));
+            row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+            CheckBox checkBox = new CheckBox(this);
+            checkBox.setOnCheckedChangeListener(checkBoxListener);
+            checkBox.setId(groups.indexOf(group));
+            checkBox.setText(group);
+            checkBox.setTextSize(20);   
+            checkBox.setTextColor(Color.WHITE);
+            row.addView(checkBox);  
+            tableLayout.addView(row);
+        }
+        
+        
+        header.setOnClickListener(headerListener);
+        drawerList.setOnItemClickListener(drawerListListener);
+        drawerLayout.closeDrawer(drawerLinear);		
+	}
+    
+	OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			Toast.makeText(getApplicationContext(), buttonView.getId()+" checked="+isChecked, Toast.LENGTH_SHORT).show();
+            
+		}
+	};
+    
+    AdapterView.OnItemClickListener drawerListListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> av, View v, int pos, long arg3) {
+            Toast.makeText(getApplicationContext(), "clicked: "+pos, Toast.LENGTH_SHORT).show();
+            switch (pos) {
+            case 0: //search
+            	break;
+            case 1: //create 
+            	break;
+            }
+            drawerList.setItemChecked(pos, false);
+            drawerLayout.closeDrawer(drawerLinear);
+        }
+    };
+    
+    View.OnClickListener headerListener = new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+            Toast.makeText(getApplicationContext(), "clicked: header", Toast.LENGTH_SHORT).show();
+            //go to user profile
+		}
+	};
+	
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (drawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+    
 }
