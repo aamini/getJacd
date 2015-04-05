@@ -62,7 +62,7 @@
         </activity>
         <activity
             android:name=".SearchGroups"
-            android:label="Search" >
+            android:label="Search Groups" >
         </activity>
     </application>
 

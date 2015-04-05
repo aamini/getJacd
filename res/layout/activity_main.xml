@@ -22,7 +22,7 @@
             tools:layout="@layout/abc_action_menu_layout" />
     </FrameLayout>
     <!-- The navigation drawer -->
-
+ 
     <LinearLayout
         android:id="@+id/navigation_layout"
         android:layout_width="240dp"

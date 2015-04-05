@@ -269,7 +269,7 @@ public class UserProfile extends Activity {
 							progress.dismiss();
 							if (e==null) {
 						        Toast.makeText(getApplication(), "Saved data successfully!", Toast.LENGTH_SHORT).show();
-						    	if (getIntent().getBooleanExtra("finishAfter",false)==true) {
+						    	if (getIntent().hasExtra("finishAfter") && getIntent().getBooleanExtra("finishAfter",false)==true) {
 						    		finish();
 						    		return;
 						    	}

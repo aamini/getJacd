@@ -1,5 +1,6 @@
 package com.get.jacd;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.flurry.android.FlurryAgent;
@@ -111,6 +112,8 @@ public class SignIn extends Activity {
 			if (users.size()==0) { //new user
 				ParseObject user = new ParseObject("User");
 				user.put("Email", accountName);
+				user.put("Groups", new ArrayList<String>());
+				user.put("Running", false);
 				user.save();
 			} else { //user already exists
 				//TODO: move directly to map

@@ -233,6 +233,7 @@ public class MapsActivity extends FragmentActivity {
         {
             mark.remove();
         }
+
         //TODO: change map clear to just remove markers ->
         setCurrentMarkerPosition(false);
         //get user locations from groups
@@ -429,6 +430,12 @@ public class MapsActivity extends FragmentActivity {
 			Toast.makeText(getApplicationContext(),
 					buttonView.getId() + " checked=" + isChecked,
 					Toast.LENGTH_SHORT).show();
+			
+			if (isChecked) {
+				addGroupFilter(buttonView.getText().toString());
+			} else {
+				removeFilter(buttonView.getText().toString());
+			}
 
 		}
 	};
