@@ -1,5 +1,8 @@
 package com.get.jacd;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -8,12 +11,11 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -21,15 +23,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.os.Bundle;
 
+import com.flurry.android.FlurryAgent;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -37,24 +39,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import com.get.jacd.R;
-import com.get.jacd.DrawerItemCustomAdapter;
-import com.get.jacd.ObjectDrawerItem;
-import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
-import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
 
 public class MapsActivity extends FragmentActivity {
@@ -153,12 +142,8 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Snippet"));
-
-
         setCurrentMarkerPosition(true);
         
-
         final Handler handler = new Handler();
         final Runnable update = new Runnable(){
             @Override
@@ -173,7 +158,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
 
-    //Draws blue marker where user currently is
+   //Draws blue marker where user currently is
    private void setCurrentMarkerPosition(boolean setup){
        // Enable MyLocation Layer of Google Map
        mMap.setMyLocationEnabled(true);
@@ -187,102 +172,99 @@ public class MapsActivity extends FragmentActivity {
        String provider = locationManager.getBestProvider(criteria, true);
 
        // Get Current Location
-       Location myLocation = locationManager.getLastKnownLocation(provider);//TODO: use different function to get location
+       //TODO: use different function to get location
+       //	   can be done usjng a listener (to push location) 
+       //	   in conjunction with timed refreshed (for pulling other locations)
+		//private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+		//	@Override
+		//	public void onMyLocationChange(Location location) {
+		//		LatLng loc = new LatLng(location.getLatitude(),
+		//				location.getLongitude());
+		//		mMarker = mMap.addMarker(new MarkerOptions().position(loc));
+		//		if (mMap != null) {
+		//			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc,
+		//					16.0f));
+		//		}
+		//	}
+	    //};
+       Location myLocation = locationManager.getLastKnownLocation(provider);
        lastLocation = myLocation;
       
-       if(myLocation!=null) {
-            // Get latitude of the current location
-            latitude = myLocation.getLatitude();
-            // Get longitude of the current location
-            longitude = myLocation.getLongitude();
-        }
-       // Create a LatLng object for the current location
-       LatLng latLng = new LatLng(latitude, longitude);
+		if (myLocation != null) {
+			// Get latitude of the current location
+			latitude = myLocation.getLatitude();
+			// Get longitude of the current location
+			longitude = myLocation.getLongitude();
+		}
+		// Create a LatLng object for the current location
+		LatLng latLng = new LatLng(latitude, longitude);
 
-       if(setup){
-        // set map type
-        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
-       // Show the current location in Google Map
-       mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-
-       // Zoom in the Google Map
-       mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-       //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-       }
+		if (setup) { 
+			mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN); // set map type 
+			mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));// Show the current location in Google Map 
+			mMap.animateCamera(CameraUpdateFactory.zoomTo(15));// Zoom in the Google Map
+		}
        
        //Saves location to server -> only if running
-       if(isRunning)
-       {
-           ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-           query.whereEqualTo("Email", USER_EMAIL);
-    		query.findInBackground(new FindCallback<ParseObject>() {
-    			public void done(List<ParseObject> users, ParseException e) {
-    				if (e == null) {
-    					ParseObject user = users.get(0);
-    					user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
-    					try {
-    						user.save();
-    						// Log.d("test","latitude: "+ latitude +" longitude:  "
-    						// + longitude);
-    					} catch (ParseException e1) {
-    						// TODO Auto-generated catch block
-    						e1.printStackTrace();
-    					}
-    					// TODO: handle exceptions
-    				}
-    			}
-    		});
-           }           
+		if (isRunning) {
+			ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+			query.whereEqualTo("Email", USER_EMAIL);
+			query.findInBackground(new FindCallback<ParseObject>() {
+				public void done(List<ParseObject> users, ParseException e) {
+					if (e == null) {
+						ParseObject user = users.get(0);
+						user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
+						try {
+							user.save(); 
+						} catch (ParseException e1) { // TODO: handle exceptions
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+		}    
    }
 
-//TODO: formalize datatypes for username and group name to stop passing so many strings around
+	// TODO: formalize datatypes for username and group name to stop passing so
+	// many strings around
     private void updateMarkers(){
-        //mMap.clear();
-        for(Marker mark: markers)
-        {
-            mark.remove();
-        }
+        for(Marker mark: markers) {
+            mark.remove(); //remove all markers
+        } 
+        
+		setCurrentMarkerPosition(false);
+		
+		// get user locations from groups
+		int colorCounter = 0;
+		for (CheckBox groupCheckBox : groupCheckBoxes) {
+			if (groupCheckBox.isChecked()) { 
+				// gets the name of the groups from the checked off boxes
+				String groupName = groupCheckBox.getText().toString();
+				// retrieves list of users in the group with name groupName
+				List<String> groupUserList = getUserList(groupName);
+				List<LatLng> userLocationList = new ArrayList<LatLng>();
+				
+				int currentColor = colorCounter % 360;
+				float[] c = new float[] { currentColor, 1, 1 };
+				groupCheckBox.setTextColor(Color.HSVToColor(c));
+				for (String username : groupUserList) {
+					// If they are running -> then add to list otherwise don't
+					if (!username.equals(USER_EMAIL) && userIsRunning(username)) {
+						LatLng loc = getUserLocation(username);
+						userLocationList.add(loc);
+						markers.add(mMap.addMarker(new MarkerOptions()
+								.position(loc)
+								.title(username)
+								.icon(BitmapDescriptorFactory
+										.defaultMarker(currentColor))));
+					}
+				}
 
-        //TODO: change map clear to just remove markers ->
-        setCurrentMarkerPosition(false);
-        //get user locations from groups
-        int colorCounter=0;
-        for(CheckBox groupCheckBox:groupCheckBoxes) {
-            if(groupCheckBox.isChecked()){
-                int currentColor = colorCounter%360;
-                //gets the name of the groups from the checked off boxes
-                String groupName = groupCheckBox.getText().toString();
-                //retrieves list of users in the group with name groupName
-                List<String> groupUserList = getUserList(groupName);
-                List<LatLng> userLocationList = new ArrayList<LatLng>();
-                float[] c = new float[]{currentColor,1,1};
-                groupCheckBox.setTextColor(Color.HSVToColor(c));
-                for(String username:groupUserList) 
-                {
-                  //If they are running -> then add to list otherwise don't
-                    if(!username.equals(USER_EMAIL) && userIsRunning(username))
-                    {
-                        LatLng loc = getUserLocation(username);
-                        userLocationList.add(loc);
-                        markers.add(mMap.addMarker(new MarkerOptions().position(loc).title(username).
-                                icon(BitmapDescriptorFactory.defaultMarker(currentColor))));
-                    }
-                }
-                
-                //addMarkers(currentColor, userLocationList);
-                colorCounter+=30; 
-            } 
-        }
-    }
-    //Add markers to all the point in the list using the color given
-   /* public void addMarkers(float hue, List<LatLng> points){
-        for(LatLng i:points){
-            //TODO: change icon for marker
-            Log.d("test2","latitude: " +i.latitude + "longitude: " + i.longitude);
-            markers.add(mMap.addMarker(new MarkerOptions().position(i).title("Username?").
-                          icon(BitmapDescriptorFactory.defaultMarker(hue))));
-        }
-    }*/
+				// addMarkers(currentColor, userLocationList);
+				colorCounter += 30;
+			}
+		}
+	} 
 
     private boolean userIsRunning(String username){
         boolean running = false;
@@ -293,8 +275,7 @@ public class MapsActivity extends FragmentActivity {
         try {
             matchingUser = query.find().get(0);
             running = matchingUser.getBoolean("Running");
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
+        } catch (ParseException e) { //TODO:catch exceptions
             e.printStackTrace();
         }
         return running;
@@ -302,39 +283,26 @@ public class MapsActivity extends FragmentActivity {
     
     
     
-   //retrieve usernames from within group and return as list
-    //TODO: make sure groups and users end up being unique on parse
-    private List<String> getUserList(String group){
-        
-        Log.d("test","Group Name for Filter: "+ group);
-        
-        List<String> userList = new ArrayList<String>();
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("Groups");
-        query.whereEqualTo("Name", group);
-        //TODO: deal with asynchronity
-        ParseObject matchingGroup;
-        try {
-            matchingGroup = query.find().get(0);
-            userList = matchingGroup.getList("Members");
-            Log.d("testing4","Members List: "+ userList);
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        /*List<String> tempList = new ArrayList<String>();
-        tempList = matchingGroup.getList("Members");*/
-       
-       /* for(String user:tempList)
-        {
-            Log.d("testing5","users in list: " + user);
-            userList.add(user);
-        }*/
-        //TODO: handle exceptions
-        return userList;
-    }
+	// retrieve usernames from within group and return as list
+	// TODO: make sure groups and users end up being unique on parse
+	private List<String> getUserList(String group) {
+		List<String> userList = new ArrayList<String>();
+		ParseQuery<ParseObject> query = ParseQuery.getQuery("Groups");
+		query.whereEqualTo("Name", group);
+		// TODO: deal with asynchronity
+		ParseObject matchingGroup;
+		try { 
+			matchingGroup = query.find().get(0);
+			userList = matchingGroup.getList("Members");
+
+		} catch (ParseException e) { // TODO: handle exceptions
+			e.printStackTrace();
+		}
+
+		return userList;
+	}
     //retrieve location from server given a username
     private LatLng getUserLocation(String username){
-        //final List<LatLng> userLocations = new ArrayList<LatLng>();
         double lat = 0;
         double lon= 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
@@ -346,19 +314,10 @@ public class MapsActivity extends FragmentActivity {
             ParseGeoPoint loc = user.getParseGeoPoint("CurrentLocation");
             lat = loc.getLatitude();
             lon = loc.getLongitude();
-        } catch (ParseException e) {
-            // TODO Auto-generated catch block
+        } catch (ParseException e) { //TODO:catch exceptions
             e.printStackTrace();
         }
-        /*query.findInBackground(new FindCallback<ParseObject>() {
-            public void done(List<ParseObject> users, ParseException e) {
-              if (e == null) {
-                ParseObject user=users.get(0);
-                ParseGeoPoint loc = user.getParseGeoPoint("CurrentLocation");
-                userLocations.add(new LatLng(loc.getLatitude(),loc.getLongitude()));
-              }
-            }
-          });*/
+ 
         return new LatLng(lat,lon);
     }
     
@@ -534,19 +493,14 @@ public class MapsActivity extends FragmentActivity {
 	
 
     OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(CompoundButton buttonView,
-                boolean isChecked) {
-           /* Toast.makeText(getApplicationContext(),
-                    buttonView.getId() + " checked=" + isChecked,
-                    Toast.LENGTH_SHORT).show();
-*/
-            if (isChecked) {
-            } else {
-                buttonView.setTextColor(Color.WHITE);
-            }
-        }
-    };
+		@Override
+		public void onCheckedChanged(CompoundButton buttonView,
+				boolean isChecked) { 
+			if (!isChecked) { 
+				buttonView.setTextColor(Color.WHITE);
+			}
+		}
+	};
 	
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
