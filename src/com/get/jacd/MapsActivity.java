@@ -506,7 +506,23 @@ public class MapsActivity extends FragmentActivity {
 			} else {
 				Toast.makeText(getApplicationContext(), "Unknown state of button!?", Toast.LENGTH_SHORT).show();
 			}
-		}
+			ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+			query.whereEqualTo("Email", USER_EMAIL);
+            query.findInBackground(new FindCallback<ParseObject>() {
+                public void done(List<ParseObject> users, ParseException e) {
+                    if (e == null) {
+                        ParseObject user = users.get(0);
+                        user.put("Running", isRunnning);
+                        try {
+                            user.save();
+                        } catch (ParseException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            });
+           }  
 	};
 	
     @Override
