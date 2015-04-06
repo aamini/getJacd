@@ -293,6 +293,9 @@ public class MapsActivity extends FragmentActivity {
    //retrieve usernames from within group and return as list
     //TODO: make sure groups and users end up being unique on parse
     private List<String> getUserList(String group){
+        
+        Log.d("test","Group Name for Filter: "+ group);
+        
         List<String> userList = new ArrayList<String>();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Groups");
         query.whereEqualTo("Name", group);
@@ -323,6 +326,8 @@ public class MapsActivity extends FragmentActivity {
         double lat = 0;
         double lon= 0;
         ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        
+        //TODO: take care of errors/exceptions
         query.whereEqualTo("Email", username);
         try {
             ParseObject user=query.find().get(0);
