@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -77,6 +78,9 @@ public class MapsActivity extends FragmentActivity {
 	private TextView drawerName, drawerEmail;
 	private LinearLayout tableLayout;
 	private List<CheckBox> groupCheckBoxes = new ArrayList<CheckBox>();
+	private Button startRunButton;
+	
+	private boolean isRunning = false;
 
     @Override
     protected void onStart() {
@@ -368,7 +372,8 @@ public class MapsActivity extends FragmentActivity {
         drawerEmail = (TextView) findViewById(R.id.text_header_user_email);
         drawerProfile = (ImageView) findViewById(R.id.image_header_user_profile);
 		tableLayout = (LinearLayout) findViewById(R.id.navigation_linear_table);
-
+		startRunButton = (Button) findViewById(R.id.button_start_stop_run);
+		
         ObjectDrawerItem[] items = new ObjectDrawerItem[2];
         items[0] = new ObjectDrawerItem(android.R.drawable.ic_menu_search, "Search");
         items[1] = new ObjectDrawerItem(android.R.drawable.ic_menu_add, "Create");
@@ -378,6 +383,7 @@ public class MapsActivity extends FragmentActivity {
                 
         header.setOnClickListener(headerListener);
         drawerList.setOnItemClickListener(drawerListListener);
+        startRunButton.setOnClickListener(toggleRunListener);
         drawerLayout.closeDrawer(drawerLinear);		
 		refreshSideBar();
 	}
@@ -475,6 +481,21 @@ public class MapsActivity extends FragmentActivity {
             myIntent.putExtra("finishAfter",true);
 
             MapsActivity.this.startActivity(myIntent);
+		}
+	};
+	
+	View.OnClickListener toggleRunListener = new View.OnClickListener() {		
+		@Override
+		public void onClick(View v) {
+			if (startRunButton.getText().equals("Start Run!")) {
+				isRunning = true;
+				startRunButton.setText("End Run!");
+			} else if (startRunButton.getText().equals("End Run!")) {
+				isRunning = false;
+				startRunButton.setText("Start Run!");
+			} else {
+				Toast.makeText(getApplicationContext(), "Unknown state of button!?", Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 	
