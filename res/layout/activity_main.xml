@@ -59,6 +59,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
         </LinearLayout>
+        
+        <Button 
+            android:id="@+id/button_start_stop_run"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Run!"/>
+        
+        
     </LinearLayout>
 
 </android.support.v4.widget.DrawerLayout>
