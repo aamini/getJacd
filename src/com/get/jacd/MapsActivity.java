@@ -407,6 +407,7 @@ public class MapsActivity extends FragmentActivity {
         header.setOnClickListener(headerListener);
         drawerList.setOnItemClickListener(drawerListListener);
         startRunButton.setOnClickListener(toggleRunListener);
+        
         drawerLayout.closeDrawer(drawerLinear);		
 		refreshSideBar();
 	}
@@ -512,7 +513,7 @@ public class MapsActivity extends FragmentActivity {
                 public void done(List<ParseObject> users, ParseException e) {
                     if (e == null) {
                         ParseObject user = users.get(0);
-                        user.put("Running", isRunnning);
+                        user.put("Running", isRunning);
                         try {
                             user.save();
                         } catch (ParseException e1) {
