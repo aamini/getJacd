@@ -164,7 +164,7 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void run(){
                 updateMarkers();
-                handler.postDelayed(this,5000);
+                handler.postDelayed(this,750);
             }
         };
        handler.postDelayed(update,5000);
@@ -249,11 +249,14 @@ public class MapsActivity extends FragmentActivity {
         int colorCounter=0;
         for(CheckBox groupCheckBox:groupCheckBoxes) {
             if(groupCheckBox.isChecked()){
+                int currentColor = colorCounter%360;
                 //gets the name of the groups from the checked off boxes
                 String groupName = groupCheckBox.getText().toString();
                 //retrieves list of users in the group with name groupName
                 List<String> groupUserList = getUserList(groupName);
                 List<LatLng> userLocationList = new ArrayList<LatLng>();
+                float[] c = new float[]{currentColor,1,1};
+                groupCheckBox.setTextColor(Color.HSVToColor(c));
                 for(String username:groupUserList) 
                 {
                   //If they are running -> then add to list otherwise don't
@@ -261,22 +264,25 @@ public class MapsActivity extends FragmentActivity {
                     {
                         LatLng loc = getUserLocation(username);
                         userLocationList.add(loc);
+                        markers.add(mMap.addMarker(new MarkerOptions().position(loc).title(username).
+                                icon(BitmapDescriptorFactory.defaultMarker(currentColor))));
                     }
                 }
-                addMarkers(colorCounter % 360, userLocationList);
+                
+                //addMarkers(currentColor, userLocationList);
                 colorCounter+=30; 
             } 
         }
     }
     //Add markers to all the point in the list using the color given
-    public void addMarkers(float hue, List<LatLng> points){
+   /* public void addMarkers(float hue, List<LatLng> points){
         for(LatLng i:points){
             //TODO: change icon for marker
             Log.d("test2","latitude: " +i.latitude + "longitude: " + i.longitude);
             markers.add(mMap.addMarker(new MarkerOptions().position(i).title("Username?").
                           icon(BitmapDescriptorFactory.defaultMarker(hue))));
         }
-    }
+    }*/
 
     private boolean userIsRunning(String username){
         boolean running = false;
@@ -426,7 +432,7 @@ public class MapsActivity extends FragmentActivity {
 			checkBox.setText(group);
 			checkBox.setTextSize(20);
 			checkBox.setTextColor(Color.WHITE);
-			
+			checkBox.setOnCheckedChangeListener(checkBoxListener);
 			groupCheckBoxes.add(checkBox);
 			row.addView(checkBox);
 			tableLayout.addView(row);
@@ -525,6 +531,22 @@ public class MapsActivity extends FragmentActivity {
             });
            }  
 	};
+	
+
+    OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView,
+                boolean isChecked) {
+           /* Toast.makeText(getApplicationContext(),
+                    buttonView.getId() + " checked=" + isChecked,
+                    Toast.LENGTH_SHORT).show();
+*/
+            if (isChecked) {
+            } else {
+                buttonView.setTextColor(Color.WHITE);
+            }
+        }
+    };
 	
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
