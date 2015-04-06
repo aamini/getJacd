@@ -65,7 +65,7 @@ public class MapsActivity extends FragmentActivity {
     double longitude = 0;
     //private Marker currentMarker; //Current location marker of user
     //keep a list of groups -> each group is a color - when refreshing can iterate through groups
-    List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
+    //List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
     List<Marker> markers = new ArrayList<Marker>();
     
     //Navigation drawer views
@@ -157,7 +157,7 @@ public class MapsActivity extends FragmentActivity {
             @Override
             public void run(){
                 updateMarkers();
-                handler.postDelayed(this,7000);
+                handler.postDelayed(this,5000);
             }
         };
        handler.postDelayed(update,5000);
@@ -182,8 +182,7 @@ public class MapsActivity extends FragmentActivity {
        // Get Current Location
        Location myLocation = locationManager.getLastKnownLocation(provider);//TODO: use different function to get location
        lastLocation = myLocation;
-       // set map type
-       mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+      
        if(myLocation!=null) {
             // Get latitude of the current location
             latitude = myLocation.getLatitude();
@@ -194,6 +193,8 @@ public class MapsActivity extends FragmentActivity {
        LatLng latLng = new LatLng(latitude, longitude);
 
        if(setup){
+        // set map type
+        mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
        // Show the current location in Google Map
        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
 
@@ -201,6 +202,9 @@ public class MapsActivity extends FragmentActivity {
        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
        //mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("You are here!").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
        }
+       
+       //Saves location to server -> only if running
+       
        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
        query.whereEqualTo("Email", USER_EMAIL);
 		query.findInBackground(new FindCallback<ParseObject>() {
@@ -222,8 +226,7 @@ public class MapsActivity extends FragmentActivity {
 		});
      
        
-       
-       
+            
    }
 
 //TODO: formalize datatypes for username and group name to stop passing so many strings around
@@ -238,20 +241,23 @@ public class MapsActivity extends FragmentActivity {
         setCurrentMarkerPosition(false);
         //get user locations from groups
         int colorCounter=0;
-        for(String groupName:filteredGroups) {
-            Log.d("testing","INSIDE GROUP LOOP");
-            List<String> groupUserList = getUserList(groupName);
-            Log.d("testing2","UserList: " + groupUserList);
-            List<LatLng> userLocationList = new ArrayList<LatLng>();
-            Log.d("testing3","userLocationList: "+userLocationList);
-            for(String username:groupUserList) 
-            {
-                LatLng loc = getUserLocation(username);
-                userLocationList.add(loc);
-            }
-            addMarkers(colorCounter % 360, userLocationList);
-            colorCounter+=30; 
-        } 
+        for(CheckBox groupCheckBox:groupCheckBoxes) {
+            if(groupCheckBox.isChecked()){
+                //gets the name of the groups from the checked off boxes
+                String groupName = groupCheckBox.getText().toString();
+                //retrieves list of users in the group with name groupName
+                List<String> groupUserList = getUserList(groupName);
+                List<LatLng> userLocationList = new ArrayList<LatLng>();
+                for(String username:groupUserList) 
+                {
+                    LatLng loc = getUserLocation(username);
+                   //If they are running -> then add to list otherwise don't
+                    userLocationList.add(loc);
+                }
+                addMarkers(colorCounter % 360, userLocationList);
+                colorCounter+=30; 
+            } 
+        }
     }
     //Add markers to all the point in the list using the color given
     public void addMarkers(float hue, List<LatLng> points){
@@ -263,16 +269,23 @@ public class MapsActivity extends FragmentActivity {
         }
     }
 
-    //Given a group, adds to list of groups that need to be filtered
-    public void addGroupFilter(String group)
-    {
-        filteredGroups.add(group);
+    private boolean userIsRunning(String username){
+        boolean running = false;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        query.whereEqualTo("Email", username);
+        //TODO: deal with asynchronity
+        ParseObject matchingUser;
+        try {
+            matchingUser = query.find().get(0);
+            running = matchingUser.getBoolean("Running");
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return running;
     }
     
-    //removes group name from filtered groups
-    public void removeFilter(String group){
-        filteredGroups.remove(group);
-    }
+    
     
    //retrieve usernames from within group and return as list
     //TODO: make sure groups and users end up being unique on parse
@@ -392,7 +405,6 @@ public class MapsActivity extends FragmentActivity {
 					LayoutParams.WRAP_CONTENT));
 			
 			CheckBox checkBox = new CheckBox(this);
-			checkBox.setOnCheckedChangeListener(checkBoxListener);
 			checkBox.setId(groups.indexOf(group));
 			checkBox.setText(group);
 			checkBox.setTextSize(20);
@@ -423,22 +435,7 @@ public class MapsActivity extends FragmentActivity {
 
 	}
 
-	OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
-		@Override
-		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {
-			Toast.makeText(getApplicationContext(),
-					buttonView.getId() + " checked=" + isChecked,
-					Toast.LENGTH_SHORT).show();
-			
-			if (isChecked) {
-				addGroupFilter(buttonView.getText().toString());
-			} else {
-				removeFilter(buttonView.getText().toString());
-			}
 
-		}
-	};
     
     AdapterView.OnItemClickListener drawerListListener = new AdapterView.OnItemClickListener() {
         @Override
