@@ -208,29 +208,28 @@ public class MapsActivity extends FragmentActivity {
        }
        
        //Saves location to server -> only if running
-       
-       ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-       query.whereEqualTo("Email", USER_EMAIL);
-		query.findInBackground(new FindCallback<ParseObject>() {
-			public void done(List<ParseObject> users, ParseException e) {
-				if (e == null) {
-					ParseObject user = users.get(0);
-					user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
-					try {
-						user.save();
-						// Log.d("test","latitude: "+ latitude +" longitude:  "
-						// + longitude);
-					} catch (ParseException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					// TODO: handle exceptions
-				}
-			}
-		});
-     
-       
-            
+       if(isRunning)
+       {
+           ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+           query.whereEqualTo("Email", USER_EMAIL);
+    		query.findInBackground(new FindCallback<ParseObject>() {
+    			public void done(List<ParseObject> users, ParseException e) {
+    				if (e == null) {
+    					ParseObject user = users.get(0);
+    					user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
+    					try {
+    						user.save();
+    						// Log.d("test","latitude: "+ latitude +" longitude:  "
+    						// + longitude);
+    					} catch (ParseException e1) {
+    						// TODO Auto-generated catch block
+    						e1.printStackTrace();
+    					}
+    					// TODO: handle exceptions
+    				}
+    			}
+    		});
+           }           
    }
 
 //TODO: formalize datatypes for username and group name to stop passing so many strings around
