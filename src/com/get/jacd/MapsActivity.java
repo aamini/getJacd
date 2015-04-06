@@ -254,7 +254,7 @@ public class MapsActivity extends FragmentActivity {
                 for(String username:groupUserList) 
                 {
                   //If they are running -> then add to list otherwise don't
-                    if(userIsRunning(username))
+                    if(!username.equals(USER_EMAIL) && userIsRunning(username))
                     {
                         LatLng loc = getUserLocation(username);
                         userLocationList.add(loc);
