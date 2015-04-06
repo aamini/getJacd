@@ -80,6 +80,9 @@ public class MapsActivity extends FragmentActivity {
 	private List<CheckBox> groupCheckBoxes = new ArrayList<CheckBox>();
 	private Button startRunButton;
 	
+	private List<String> prevGroups = new ArrayList<String>();
+	private List<String> currGroups;
+	
 	private boolean isRunning = false;
 
     @Override
@@ -408,17 +411,17 @@ public class MapsActivity extends FragmentActivity {
 		refreshSideBar();
 	}
     
-	private void updateTableView(List<String> groups) {
+	private void updateTableView() {
 		groupCheckBoxes.clear();
 		tableLayout.removeAllViews();
 		
-		for (String group : groups) {
+		for (String group : currGroups) {
 			TableRow row = new TableRow(this);
 			row.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 					LayoutParams.WRAP_CONTENT));
 			
 			CheckBox checkBox = new CheckBox(this);
-			checkBox.setId(groups.indexOf(group));
+			checkBox.setId(currGroups.indexOf(group));
 			checkBox.setText(group);
 			checkBox.setTextSize(20);
 			checkBox.setTextColor(Color.WHITE);
@@ -442,8 +445,11 @@ public class MapsActivity extends FragmentActivity {
 			byte[] arr = user.getParseFile("Image").getData();
 			drawerProfile.setImageBitmap(BitmapFactory.decodeByteArray(arr, 0,arr.length));
 
-			List<String> list = user.getList("Groups");
-			updateTableView(list);
+			currGroups = user.getList("Groups");
+			if (!currGroups.equals(prevGroups)) {
+				updateTableView();
+			}
+			prevGroups = currGroups;
 		} catch (ParseException e) {}
 
 	}
