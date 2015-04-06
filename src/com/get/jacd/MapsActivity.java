@@ -250,9 +250,12 @@ public class MapsActivity extends FragmentActivity {
                 List<LatLng> userLocationList = new ArrayList<LatLng>();
                 for(String username:groupUserList) 
                 {
-                    LatLng loc = getUserLocation(username);
-                   //If they are running -> then add to list otherwise don't
-                    userLocationList.add(loc);
+                  //If they are running -> then add to list otherwise don't
+                    if(userIsRunning(username))
+                    {
+                        LatLng loc = getUserLocation(username);
+                        userLocationList.add(loc);
+                    }
                 }
                 addMarkers(colorCounter % 360, userLocationList);
                 colorCounter+=30; 
