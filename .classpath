@@ -5,8 +5,8 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/getJacdApp/libs/Parse/bolts-android-1.1.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/getJacdApp/libs/Parse/Parse-1.9.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/Alexander/Documents/MIT/Sophmore/Spring/21W.789/getJacdApp/libs/Flurry/Flurry Analytics/FlurryAnalytics-5.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/David/Documents/MIT/Sophmore/Spring/21W.789/getJacd/libs/Parse/bolts-android-1.1.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/David/Documents/MIT/Sophmore/Spring/21W.789/getJacd/libs/Parse/Parse-1.9.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/David/Documents/MIT/Sophmore/Spring/21W.789/getJacd/libs/Flurry/Flurry Analytics/FlurryAnalytics-5.3.0.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
