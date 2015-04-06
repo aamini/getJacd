@@ -249,6 +249,7 @@ public class MapsActivity extends FragmentActivity {
         int colorCounter=0;
         for(CheckBox groupCheckBox:groupCheckBoxes) {
             if(groupCheckBox.isChecked()){
+                int currentColor = colorCounter%360;
                 //gets the name of the groups from the checked off boxes
                 String groupName = groupCheckBox.getText().toString();
                 //retrieves list of users in the group with name groupName
@@ -263,7 +264,9 @@ public class MapsActivity extends FragmentActivity {
                         userLocationList.add(loc);
                     }
                 }
-                addMarkers(colorCounter % 360, userLocationList);
+                float[] c = new float[]{currentColor,1,1};
+                groupCheckBox.setTextColor(Color.HSVToColor(c));
+                addMarkers(currentColor, userLocationList);
                 colorCounter+=30; 
             } 
         }
@@ -512,7 +515,7 @@ public class MapsActivity extends FragmentActivity {
                 public void done(List<ParseObject> users, ParseException e) {
                     if (e == null) {
                         ParseObject user = users.get(0);
-                        user.put("Running", isRunnning);
+                        user.put("Running", isRunning);
                         try {
                             user.save();
                         } catch (ParseException e1) {
