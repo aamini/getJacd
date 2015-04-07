@@ -25,6 +25,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.flurry.android.FlurryAgent;
 import com.get.jacd.R;
 import com.get.jacd.SignIn;
 import com.get.jacd.UserProfile;
@@ -41,6 +42,18 @@ public class SearchGroups extends Activity {
 	private EditText searchInput;
 	private Button searchButton;
 	private String USER_EMAIL;
+	
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, App.FLURRY_ID);
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
+    }
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

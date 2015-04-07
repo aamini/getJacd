@@ -1,12 +1,9 @@
 package com.get.jacd;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.BitmapFactory;
@@ -14,14 +11,11 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -36,7 +30,6 @@ import android.widget.ListView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-import bolts.Task;
 
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,12 +46,16 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity_backup extends FragmentActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private String USER_EMAIL = null;
     Location lastLocation;
     double latitude = 0;
     double longitude = 0;
+    //private Marker currentMarker; //Current location marker of user
+    //keep a list of groups -> each group is a color - when refreshing can iterate through groups
+    //List<String> filteredGroups = new ArrayList<String>(); //Arrays.asList("Test") for testing
     List<Marker> markers = new ArrayList<Marker>();
     
     //Navigation drawer views
@@ -72,23 +69,11 @@ public class MapsActivity extends FragmentActivity {
 	private List<CheckBox> groupCheckBoxes = new ArrayList<CheckBox>();
 	private Button startRunButton;
 	
-	private HashMap<String,Marker> userToMarker = new HashMap<String,Marker>();
-	private HashMap<String,String> userToGroup = new HashMap<String,String>();
-	private HashMap<String,Integer> groupToInd = new HashMap<String,Integer>();
-	private HashMap<String,float[]> groupToColor = new HashMap<String,float[]>();
 	private List<String> prevGroups = new ArrayList<String>();
 	private List<String> currGroups;
-	private int numCheckedGroups;
 	
 	private boolean isRunning = false;
-	private boolean firstMapDraw = true; 
-	
-    private String USER_EMAIL = null;
-    private ParseObject myUserData = null;
-    
-    AlertDialog internetAlert;
-    
-    
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -109,24 +94,9 @@ public class MapsActivity extends FragmentActivity {
         Intent intent = getIntent();
         USER_EMAIL = intent.getStringExtra("email"); 
         
-        updateUserParseObject();
-        //FIXME: show loading progress dialog
- 
-        setupNavigationDrawer(); 
+        setupNavigationDrawer();
+        
         setUpMapIfNeeded();
-        
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setMessage("Internet is off! Turn on to continue!")
-				.setCancelable(false)
-				.setPositiveButton("OK",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int id) {
-								// do things
-							}
-						});
-		internetAlert = builder.create();
-        
     }
 
 
@@ -172,116 +142,142 @@ public class MapsActivity extends FragmentActivity {
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
     private void setUpMap() {
-    	firstMapDraw = true;
-    	
-		mMap.setMyLocationEnabled(true); 
-    	mMap.setOnMyLocationChangeListener(myLocationChangeListener);
+        setCurrentMarkerPosition(true);
         
         final Handler handler = new Handler();
         final Runnable update = new Runnable(){
             @Override
-            public void run() {
-            	if (isNetworkAvailable()) {
-            		updateMarkers();
-            	}
+            public void run(){
+                updateMarkers();
                 handler.postDelayed(this,750);
             }
         };
-       handler.postDelayed(update,2000);
+       handler.postDelayed(update,5000);
+
 
     }
 
 
+   //Draws blue marker where user currently is
+   private void setCurrentMarkerPosition(boolean setup){
+       // Enable MyLocation Layer of Google Map
+       mMap.setMyLocationEnabled(true);
+       // Get LocationManager object from System Service LOCATION_SERVICE
+       LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+       // Create a criteria object to retrieve provider
+       Criteria criteria = new Criteria();
+
+       // Get the name of the best provider
+       String provider = locationManager.getBestProvider(criteria, true);
+
+       // Get Current Location
+       //TODO: use different function to get location
+       //	   can be done usjng a listener (to push location) 
+       //	   in conjunction with timed refreshed (for pulling other locations)
+		//private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
+		//	@Override
+		//	public void onMyLocationChange(Location location) {
+		//		LatLng loc = new LatLng(location.getLatitude(),
+		//				location.getLongitude());
+		//		mMarker = mMap.addMarker(new MarkerOptions().position(loc));
+		//		if (mMap != null) {
+		//			mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc,
+		//					16.0f));
+		//		}
+		//	}
+	    //};
+       Location myLocation = locationManager.getLastKnownLocation(provider);
+       lastLocation = myLocation;
+      
+		if (myLocation != null) {
+			// Get latitude of the current location
+			latitude = myLocation.getLatitude();
+			// Get longitude of the current location
+			longitude = myLocation.getLongitude();
+		}
+		// Create a LatLng object for the current location
+		LatLng latLng = new LatLng(latitude, longitude);
+
+		if (setup) { 
+			mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN); // set map type 
+			mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));// Show the current location in Google Map 
+			mMap.animateCamera(CameraUpdateFactory.zoomTo(15));// Zoom in the Google Map
+		}
+       
+       //Saves location to server -> only if running
+		if (isRunning) {
+			ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+			query.whereEqualTo("Email", USER_EMAIL);
+			query.findInBackground(new FindCallback<ParseObject>() {
+				public void done(List<ParseObject> users, ParseException e) {
+					if (e == null) {
+						ParseObject user = users.get(0);
+						user.put("CurrentLocation", new ParseGeoPoint(latitude,longitude));
+						try {
+							user.save(); 
+						} catch (ParseException e1) { // TODO: handle exceptions
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+		}    
+   }
+
 	// TODO: formalize datatypes for username and group name to stop passing so
 	// many strings around
     private void updateMarkers(){
-    	
+        for(Marker mark: markers) {
+            mark.remove(); //remove all markers
+        } 
+        
+		setCurrentMarkerPosition(false);
+		
 		// get user locations from groups
-		//userToGroup = new HashMap<String,String>();
-		//groupToInd = new HashMap<String,Integer>();
-		numCheckedGroups=0;
+		int colorCounter = 0;
 		for (CheckBox groupCheckBox : groupCheckBoxes) {
-			if (groupCheckBox.isChecked()) {
-				groupToInd.put(groupCheckBox.getText().toString(), numCheckedGroups);
-				numCheckedGroups++;
-			} else {
-				groupToInd.remove(groupCheckBox.getText().toString());
-			}
-		}
-		
-		
-		int ind=0;
-		for (CheckBox groupCheckBox : groupCheckBoxes) {	
-			//name of group
-			String groupName = groupCheckBox.getText().toString();
-			//user emails in group
-			List<String> groupUserList = getUserList(groupName); 
-
-			if (groupCheckBox.isChecked()) {
-
+			if (groupCheckBox.isChecked()) { 
+				// gets the name of the groups from the checked off boxes
+				String groupName = groupCheckBox.getText().toString();
+				// retrieves list of users in the group with name groupName
+				List<String> groupUserList = getUserList(groupName);
+				List<LatLng> userLocationList = new ArrayList<LatLng>();
+				
+				int currentColor = colorCounter % 360;
+				float[] c = new float[] { currentColor, 1, 1 };
+				groupCheckBox.setTextColor(Color.HSVToColor(c));
 				for (String username : groupUserList) {
 					// If they are running -> then add to list otherwise don't
-					userToGroup.put(username,groupCheckBox.getText().toString());
-					
-					ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-			        query.whereEqualTo("Email", username);
-			        query.findInBackground(updateCallback);
-					
-				} 
-			} else { 
-				for (String u : groupUserList) {
-					if (userToMarker.containsKey(u)){
-						Marker mark = userToMarker.get(u);
-						mark.remove();
-						userToMarker.remove(u);
+					if (!username.equals(USER_EMAIL) && userIsRunning(username)) {
+						LatLng loc = getUserLocation(username);
+						userLocationList.add(loc);
+						markers.add(mMap.addMarker(new MarkerOptions()
+								.position(loc)
+								.title(username)
+								.icon(BitmapDescriptorFactory
+										.defaultMarker(currentColor))));
 					}
-				}
+				} 
+				colorCounter += 30;
 			}
 		}
 	} 
 
-    private FindCallback<ParseObject> updateCallback = new FindCallback<ParseObject>() { 
-		@Override
-		public void done(List<ParseObject> u, ParseException e) { 
-			if (e!=null)
-				return;
-			ParseObject user = u.get(0);
-			String username = user.getString("Email").toString();
-
-			if (!user.getBoolean("Running") || username.equals(USER_EMAIL)) {
-				if (userToMarker.containsKey(username)) {
-					userToMarker.get(username).remove();
-					userToMarker.remove(username);
-				}
-				return;
-			}
-			
-            ParseGeoPoint cur = user.getParseGeoPoint("CurrentLocation");
-			if (userToMarker.containsKey(username)) {
-				// compare previous marker location to current
-	            Marker mark = userToMarker.get(username);
-	            LatLng prev = mark.getPosition();
-				if (cur.getLatitude()!=prev.latitude || cur.getLongitude()!=prev.longitude) {
-					mark.setPosition(new LatLng(cur.getLatitude(),cur.getLongitude()));
-
-				}
-				
-			} else if (cur!=null){
-				String groupName = userToGroup.get(username);
-				
-				updateGroupColorMap();
-				int hue = (int) (groupToColor.get(groupName)[0]);
-				
-				Marker mark = mMap.addMarker(new MarkerOptions()
-					.position(new LatLng(cur.getLatitude(),cur.getLongitude()))
-					.title(username)
-					.icon(BitmapDescriptorFactory
-							.defaultMarker(hue)));
-				
-				userToMarker.put(username,mark);
-			}
-		}
-	};
+    private boolean userIsRunning(String username){
+        boolean running = false;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        query.whereEqualTo("Email", username);
+        //TODO: deal with asynchronity
+        ParseObject matchingUser;
+        try {
+            matchingUser = query.find().get(0);
+            running = matchingUser.getBoolean("Running");
+        } catch (ParseException e) { //TODO:catch exceptions
+            e.printStackTrace();
+        }
+        return running;
+    }
     
     
     
@@ -291,8 +287,10 @@ public class MapsActivity extends FragmentActivity {
 		List<String> userList = new ArrayList<String>();
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Groups");
 		query.whereEqualTo("Name", group);
- 		try { 
-			ParseObject matchingGroup = query.find().get(0);
+		// TODO: deal with asynchronity
+		ParseObject matchingGroup;
+		try { 
+			matchingGroup = query.find().get(0);
 			userList = matchingGroup.getList("Members");
 
 		} catch (ParseException e) { // TODO: handle exceptions
@@ -300,7 +298,27 @@ public class MapsActivity extends FragmentActivity {
 		}
 
 		return userList;
-	} 
+	}
+    //retrieve location from server given a username
+    private LatLng getUserLocation(String username){
+        double lat = 0;
+        double lon= 0;
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        
+        //TODO: take care of errors/exceptions
+        query.whereEqualTo("Email", username);
+        try {
+            ParseObject user=query.find().get(0);
+            ParseGeoPoint loc = user.getParseGeoPoint("CurrentLocation");
+            lat = loc.getLatitude();
+            lon = loc.getLongitude();
+        } catch (ParseException e) { //TODO:catch exceptions
+            e.printStackTrace();
+        }
+ 
+        return new LatLng(lat,lon);
+    }
+    
     
     private void setupNavigationDrawer() {
         // R.id.drawer_layout should be in every activity with exactly the same id.
@@ -318,9 +336,6 @@ public class MapsActivity extends FragmentActivity {
         	public void onDrawerClosed(View view) {
 				super.onDrawerClosed(view);
 				// update drawer every time it is closed
-				if (isNetworkAvailable()) {
-					updateUserParseObject();
-				}
 				refreshSideBar();
 			} 
         };
@@ -376,72 +391,29 @@ public class MapsActivity extends FragmentActivity {
 		}
 	}
 	
-	/**
-	 * Resets the sidebar's :
-	 * 	user name/email 
-	 * 	profile picture
-	 *  group list if they are new
-	 */
 	private void refreshSideBar() {
-		drawerName.setText(myUserData.getString("First") + " "
-				+ myUserData.getString("Last"));
-		drawerEmail.setText(myUserData.getString("Email"));
-
 		try {
-			byte[] arr = myUserData.getParseFile("Image").getData();
-			drawerProfile.setImageBitmap(BitmapFactory.decodeByteArray(arr, 0,
-					arr.length));
-		} catch (ParseException e) {
-		}
+			ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
 
-		currGroups = myUserData.getList("Groups");
-		if (!currGroups.equals(prevGroups)) {
-			updateTableView();
-		}
-		prevGroups = currGroups;
+			query.whereEqualTo("Email", USER_EMAIL);
+			ParseObject user = query.find().get(0);
+
+			drawerName.setText(user.getString("First") +" "+ user.getString("Last"));
+			drawerEmail.setText(user.getString("Email"));
+
+			byte[] arr = user.getParseFile("Image").getData();
+			drawerProfile.setImageBitmap(BitmapFactory.decodeByteArray(arr, 0,arr.length));
+
+			currGroups = user.getList("Groups");
+			if (!currGroups.equals(prevGroups)) {
+				updateTableView();
+			}
+			prevGroups = currGroups;
+		} catch (ParseException e) {}
+
 	}
 
-	/**
-	 * Queries parse to get the user data
-	 */
-	private void updateUserParseObject() {
-		//Toast.makeText(getApplicationContext(), "updating user", Toast.LENGTH_SHORT).show();
-		ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
-		query.whereEqualTo("Email", USER_EMAIL);
-		try {
-			myUserData = query.find().get(0);
-		} catch (ParseException e) {
-			Log.d("error","details",e) ;
-		}
-	}
 
-	GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
-		@Override
-		public void onMyLocationChange(Location location) {
-			
-			//Toast.makeText(getApplicationContext(), 
-			//		"new location: "+location.getLatitude()+","+location.getLongitude(),
-			//		Toast.LENGTH_SHORT).show();
-			
-			if (firstMapDraw) {
-				LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-				mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN); // set map type
-				mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));// Show the current location in Google Map
-				mMap.animateCamera(CameraUpdateFactory.zoomTo(15));// Zoom in the Google Map
-				firstMapDraw=false;
-			}
-
-			// Saves location to server -> only if running
-			if (isRunning) {
-				myUserData.put("CurrentLocation", 
-						new ParseGeoPoint(
-								location.getLatitude(),
-								location.getLongitude()));
-				myUserData.saveEventually();
-			}
-		}
-	};
     
     AdapterView.OnItemClickListener drawerListListener = new AdapterView.OnItemClickListener() {
         @Override
@@ -451,14 +423,14 @@ public class MapsActivity extends FragmentActivity {
             Intent myIntent;
             switch (pos) {
             case 1: //search
-                myIntent = new Intent(MapsActivity.this, SearchGroups.class);
+                myIntent = new Intent(MapsActivity_backup.this, SearchGroups.class);
                 myIntent.putExtra("email", USER_EMAIL); //Optional parameters
-                MapsActivity.this.startActivity(myIntent);
+                MapsActivity_backup.this.startActivity(myIntent);
             	break;
             case 2: //create 
-                myIntent = new Intent(MapsActivity.this, CreateGroup.class);
+                myIntent = new Intent(MapsActivity_backup.this, CreateGroup.class);
                 myIntent.putExtra("email", USER_EMAIL); //Optional parameters
-                MapsActivity.this.startActivity(myIntent);
+                MapsActivity_backup.this.startActivity(myIntent);
             	break;
             }
             drawerList.setItemChecked(pos, false);
@@ -473,11 +445,11 @@ public class MapsActivity extends FragmentActivity {
 
             Toast.makeText(getApplicationContext(), "clicked: header", Toast.LENGTH_SHORT).show();
             //go to user profile
-            Intent myIntent = new Intent(MapsActivity.this, UserProfile.class);
+            Intent myIntent = new Intent(MapsActivity_backup.this, UserProfile.class);
             myIntent.putExtra("email", USER_EMAIL); //Optional parameters
             myIntent.putExtra("finishAfter",true);
 
-            MapsActivity.this.startActivity(myIntent);
+            MapsActivity_backup.this.startActivity(myIntent);
 		}
 	};
 	
@@ -502,8 +474,9 @@ public class MapsActivity extends FragmentActivity {
                         user.put("Running", isRunning);
                         try {
                             user.save();
-                        } catch (ParseException e1) { //TODO:exceptions
-                        	e1.printStackTrace();
+                        } catch (ParseException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
                         }
                     }
                 }
@@ -515,82 +488,13 @@ public class MapsActivity extends FragmentActivity {
     OnCheckedChangeListener checkBoxListener = new OnCheckedChangeListener() {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
-				boolean isChecked) {  
-						
-			numCheckedGroups=0;
-			for (CheckBox box: groupCheckBoxes) {
-				if (box.isChecked()) {
-					groupToInd.put(box.getText().toString(), numCheckedGroups);
-					numCheckedGroups++;
-				}
-
-			}
-			
-			for (CheckBox box : groupCheckBoxes) {
-				if (!box.isChecked()) { 
-					box.setTextColor(Color.WHITE);
-					continue;
-				}
-				
-				//name of group
-				String groupName = box.getText().toString();
-				
-				updateGroupColorMap();
-				box.setTextColor(Color.HSVToColor(groupToColor.get(groupName)));
-				
-				//each user in group
-				for (String u : userToGroup.keySet()) {
-					if (userToGroup.get(u).equals(groupName)) {
-						// update color of marker
-						if (userToMarker.containsKey(u)) {
-							Log.d("recoloring-check", "user:" + u);
-							Marker mark = userToMarker.get(u);
-							int hue = (int) (groupToColor.get(groupName)[0]);
-
-							mark.setIcon(BitmapDescriptorFactory
-									.defaultMarker(hue));
-							userToMarker.put(u, mark);
-						}
-					}
-				}
+				boolean isChecked) { 
+			if (!isChecked) { 
+				buttonView.setTextColor(Color.WHITE);
 			}
 		}
 	};
 	
-	private void updateGroupColorMap() {
-		int i=0;
-		for (CheckBox box : groupCheckBoxes) {
-			if (box.isChecked()) {
-				String groupName = box.getText().toString();
-				//color text
-				float ratio = ((float) (i)) / ((float) (numCheckedGroups));
-				Log.d("amini","updating group"+groupName+" "+i+"/"+numCheckedGroups+"="+ratio);
-				float[] c = new float[]{(float) (ratio*360.0),1,1};
-				groupToColor.put(groupName,c);
-				box.setTextColor(Color.HSVToColor(c));
-				i++;
-			}
-		}
-	}
-
-	/**
-     * Check if network is available on device
-     * @return true if network is connected, false otherwise
-     */
-	public boolean isNetworkAvailable() {
-		ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo activeNetworkInfo = connectivityManager
-				.getActiveNetworkInfo();
-		boolean available = activeNetworkInfo != null
-				&& activeNetworkInfo.isConnected();
-
-		if (!available && !internetAlert.isShowing()) {
-			internetAlert.show();
-		}
-		return available;
-	}
-	
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 

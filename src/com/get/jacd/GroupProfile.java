@@ -2,6 +2,7 @@ package com.get.jacd;
 
 import java.util.List;
 
+import com.flurry.android.FlurryAgent;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -46,7 +47,17 @@ public class GroupProfile extends Activity {
 	private static final String BUTTON_JOIN = "Join";
 	private static final String BUTTON_UNJOIN = "Unjoin";
 	
-	
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FlurryAgent.onStartSession(this, App.FLURRY_ID);
+    }
+    
+    @Override
+    protected void onStop() {
+        super.onStop();
+        FlurryAgent.onEndSession(this);
+    }
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
