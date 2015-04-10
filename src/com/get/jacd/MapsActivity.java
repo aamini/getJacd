@@ -20,8 +20,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -93,6 +95,8 @@ public class MapsActivity extends FragmentActivity {
     protected void onStart() {
         super.onStart();
         FlurryAgent.onStartSession(this, App.FLURRY_ID);
+		FlurryAgent.logEvent("Start: MapsActivity");
+
     }
     
     @Override
@@ -184,7 +188,7 @@ public class MapsActivity extends FragmentActivity {
             	if (isNetworkAvailable()) {
             		updateMarkers();
             	}
-                handler.postDelayed(this,750);
+                handler.postDelayed(this,2000);
             }
         };
        handler.postDelayed(update,2000);
@@ -502,6 +506,8 @@ public class MapsActivity extends FragmentActivity {
                         user.put("Running", isRunning);
                         try {
                             user.save();
+							FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
+							
                         } catch (ParseException e1) { //TODO:exceptions
                         	e1.printStackTrace();
                         }
@@ -564,10 +570,9 @@ public class MapsActivity extends FragmentActivity {
 				String groupName = box.getText().toString();
 				//color text
 				float ratio = ((float) (i)) / ((float) (numCheckedGroups));
-				Log.d("amini","updating group"+groupName+" "+i+"/"+numCheckedGroups+"="+ratio);
+				//Log.d("amini","updating group"+groupName+" "+i+"/"+numCheckedGroups+"="+ratio);
 				float[] c = new float[]{(float) (ratio*360.0),1,1};
 				groupToColor.put(groupName,c);
-				box.setTextColor(Color.HSVToColor(c));
 				i++;
 			}
 		}
@@ -585,17 +590,38 @@ public class MapsActivity extends FragmentActivity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available && !internetAlert.isShowing()) {
+			FlurryAgent.logEvent("MapsActivity: No Internet Available");
+
 			internetAlert.show();
 		}
 		return available;
 	}
 	
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (drawerToggle.onOptionsItemSelected(item)) {
             return true;
+        }
+        
+        switch (item.getItemId()) {
+        case (R.id.menu_main_logout):
+			FlurryAgent.logEvent("MapsActivity Logout: "+USER_EMAIL);
+
+    		getSharedPreferences(SignIn.PREFS_NAME, MODE_PRIVATE)
+    		.edit()
+    		.clear()
+    		.commit();
+			finish();
+			return true;
         }
         return super.onOptionsItemSelected(item);
 

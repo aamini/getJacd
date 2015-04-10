@@ -66,6 +66,7 @@ public class UserProfile extends Activity {
 	protected void onStart() {
 		super.onStart();
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);
+		FlurryAgent.logEvent("Start: UserProfile");
 	}
 	
 	@Override
@@ -192,6 +193,8 @@ public class UserProfile extends Activity {
     } 
 	
     private void loadProfileFromParse() {
+		FlurryAgent.logEvent("Loading UserProfile: "+USER_EMAIL);
+
     	progress = new ProgressDialog(this);
     	progress.setTitle("Loading");
     	progress.setMessage("Retrieving Data...");
@@ -243,6 +246,8 @@ public class UserProfile extends Activity {
      * Save all content of page to Parse database
      */
     private void saveProfileToParse() {
+		FlurryAgent.logEvent("Saving UserProfile: "+USER_EMAIL);
+
     	progress.setMessage("Saving Data...");
     	progress.show();
     	
@@ -354,6 +359,8 @@ public class UserProfile extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
+			FlurryAgent.logEvent("No internet available: UserProfile; "+USER_EMAIL);
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")
 					.setCancelable(false)
@@ -385,9 +392,13 @@ public class UserProfile extends Activity {
 		int id = item.getItemId();
 		switch (id) {
 		case (R.id.menu_finish):
+			FlurryAgent.logEvent("UserProfile Finish: "+USER_EMAIL);
+
 			finishProfile();
 			return true;
 		case (R.id.menu_logout):
+			FlurryAgent.logEvent("UserProfile Logout: "+USER_EMAIL);
+
     		getSharedPreferences(SignIn.PREFS_NAME, MODE_PRIVATE)
     		.edit()
     		.clear()

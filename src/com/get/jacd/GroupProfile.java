@@ -50,7 +50,8 @@ public class GroupProfile extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        FlurryAgent.onStartSession(this, App.FLURRY_ID);
+        FlurryAgent.onStartSession(this, App.FLURRY_ID);			
+		FlurryAgent.logEvent("Start: GroupProfile");
     }
     
     @Override
@@ -67,6 +68,8 @@ public class GroupProfile extends Activity {
 		Intent intent = getIntent();
 		USER_EMAIL = intent.getStringExtra("email");
 		GROUP_NAME = intent.getStringExtra("group"); 
+		FlurryAgent.logEvent("Open Group: "+USER_EMAIL+","+GROUP_NAME);
+
 		
 		initViews();
 		loadUserGroupParse();
@@ -119,7 +122,7 @@ public class GroupProfile extends Activity {
 	}
 
 	private void loadUserGroupParse() {
-    	
+		FlurryAgent.logEvent("Loading GroupProfile Data: "+USER_EMAIL+","+GROUP_NAME);
 		List<ParseObject> users = queryTableForValue("User", "Email", USER_EMAIL);
 		if (users!=null && users.size()>0) {
 			user = users.get(0);
@@ -156,6 +159,8 @@ public class GroupProfile extends Activity {
 		progress.dismiss();	
 
 		
+		FlurryAgent.logEvent("GroupProfile error: "+e.getMessage()+";"+USER_EMAIL+","+GROUP_NAME);
+
 		new AlertDialog.Builder(this)
 	    .setTitle("Error")
 	    .setMessage("Oops! We got an error: "+e.getMessage())
@@ -229,6 +234,7 @@ public class GroupProfile extends Activity {
 			try {
 				user.save();
 				group.save();
+				FlurryAgent.logEvent("GroupProfile "+title+": "+USER_EMAIL+","+GROUP_NAME);
 			} catch (ParseException e) {
 				errorDialog(e);
 			}
@@ -269,6 +275,8 @@ public class GroupProfile extends Activity {
 						try {
 							user.save();
 							group.save();
+							FlurryAgent.logEvent("GroupProfile Added user: "+newUserEmail
+									+";"+USER_EMAIL+","+GROUP_NAME);
 						} catch (ParseException e) {
 							errorDialog(e);
 						}
@@ -308,6 +316,7 @@ public class GroupProfile extends Activity {
 		int id = item.getItemId();
 		switch (id) {
 		case (R.id.menu_refresh):
+			FlurryAgent.logEvent("GroupProfile Refresh: "+USER_EMAIL+","+GROUP_NAME);
 			refreshPage();
 			break;
 		}

@@ -53,6 +53,8 @@ public class CreateGroup extends Activity {
 	protected void onStart() {
 		super.onStart();
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);
+		FlurryAgent.logEvent("Start: CreateGroup");
+
 	}
 	
 	@Override
@@ -186,7 +188,8 @@ public class CreateGroup extends Activity {
 						group.save();
 						
 						Toast.makeText(getApplication(), "New Group: "+name.getText()+" created!", Toast.LENGTH_SHORT).show();
-						
+						FlurryAgent.logEvent("CreateGroup Created: "+USER_EMAIL+";"+name.getText());
+
 						progress.dismiss();
 						Intent myIntent = new Intent(CreateGroup.this, GroupProfile.class);
 		                myIntent.putExtra("email", USER_EMAIL); //Optional parameters
@@ -194,6 +197,8 @@ public class CreateGroup extends Activity {
 		                CreateGroup.this.startActivity(myIntent);
 		            	finish();
 					} catch (ParseException e1) {
+						FlurryAgent.logEvent("CreateGroup Error Saving: "+e.getMessage()+";"+USER_EMAIL+";"+name.getText());
+
     	            	new CustomAlertDialog(
     	            			getApplicationContext(), 
     	            			"Error saving group. Details: "+e.getMessage())
@@ -217,6 +222,8 @@ public class CreateGroup extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
+			FlurryAgent.logEvent("CreateGroup No Internet: "+USER_EMAIL+";"+name.getText());
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")
 					.setCancelable(false)

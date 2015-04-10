@@ -47,6 +47,7 @@ public class SearchGroups extends Activity {
     protected void onStart() {
         super.onStart();
         FlurryAgent.onStartSession(this, App.FLURRY_ID);
+		FlurryAgent.logEvent("Start: SearchGroups");
     }
     
     @Override
@@ -72,6 +73,7 @@ public class SearchGroups extends Activity {
 			public void onClick(View v) {
 				if (isNetworkAvailable()) {
 					String input = searchInput.getText().toString();
+					FlurryAgent.logEvent("Search requested: "+input+";"+USER_EMAIL);
 					search(input);
 				}
 			}
@@ -121,6 +123,10 @@ public class SearchGroups extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
 				TextView textView = (TextView) viewClicked; 
+				
+				FlurryAgent.logEvent("Clicked: "+textView.getText().toString()+";"+USER_EMAIL);
+				FlurryAgent.logEvent("Transfer: SearchGroups, GroupProfile;"+USER_EMAIL);
+
 				//the textView is clicked, so we want to progress to Group Profile
 				Intent myIntent = new Intent(SearchGroups.this, GroupProfile.class); //current class, next class
 		        myIntent.putExtra("email", USER_EMAIL); 
@@ -142,6 +148,9 @@ public class SearchGroups extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
+			
+			FlurryAgent.logEvent("No internet available: SearchGroups;"+USER_EMAIL);
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")
 					.setCancelable(false)

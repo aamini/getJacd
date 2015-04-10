@@ -1,5 +1,7 @@
 package com.get.jacd;
 
+import com.flurry.android.FlurryAgent;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,6 +13,7 @@ public class CustomAlertDialog extends AlertDialog.Builder
         // Set your theme here
         super(context);
         
+
         this.setTitle("Error!");
         this.setMessage(message);
         
