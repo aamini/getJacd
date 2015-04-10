@@ -55,7 +55,6 @@ public class CreateGroup extends Activity {
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);		
         FlurryAgent.onPageView();
 		FlurryAgent.logEvent("Start: CreateGroup");
-
 	}
 	
 	@Override

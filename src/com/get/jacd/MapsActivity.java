@@ -189,10 +189,10 @@ public class MapsActivity extends FragmentActivity {
             	if (isNetworkAvailable()) {
             		updateMarkers();
             	}
-                handler.postDelayed(this,2000);
+                handler.postDelayed(this,5000);
             }
         };
-       handler.postDelayed(update,2000);
+       handler.postDelayed(update,5000);
 
     }
 
