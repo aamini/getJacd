@@ -46,7 +46,8 @@ public class SearchGroups extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        FlurryAgent.onStartSession(this, App.FLURRY_ID);
+        FlurryAgent.onStartSession(this, App.FLURRY_ID);		
+        FlurryAgent.onPageView();
 		FlurryAgent.logEvent("Start: SearchGroups");
     }
     
