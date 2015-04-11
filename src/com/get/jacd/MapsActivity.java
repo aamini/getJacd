@@ -436,6 +436,7 @@ public class MapsActivity extends FragmentActivity {
 				mMap.animateCamera(CameraUpdateFactory.zoomTo(15));// Zoom in the Google Map
 				firstMapDraw=false;
 			}
+			FlurryAgent.logEvent("Location: "+USER_EMAIL+","+location.getLatitude()+","+location.getLongitude());
 
 			// Saves location to server -> only if running
 			if (isRunning) {
@@ -444,6 +445,7 @@ public class MapsActivity extends FragmentActivity {
 								location.getLatitude(),
 								location.getLongitude()));
 				myUserData.saveEventually();
+
 			}
 		}
 	};
@@ -495,6 +497,8 @@ public class MapsActivity extends FragmentActivity {
 			} else if (startRunButton.getText().equals("End Run!")) {
 				isRunning = false;
 				startRunButton.setText("Start Run!");
+				FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
+
 			} else {
 				Toast.makeText(getApplicationContext(), "Unknown state of button!?", Toast.LENGTH_SHORT).show();
 			}
