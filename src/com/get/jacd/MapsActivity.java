@@ -531,15 +531,19 @@ public class MapsActivity extends FragmentActivity {
 		@Override
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {  
-						
+			
 			numCheckedGroups=0;
+			String groupsList = "";
 			for (CheckBox box: groupCheckBoxes) {
 				if (box.isChecked()) {
 					groupToInd.put(box.getText().toString(), numCheckedGroups);
 					numCheckedGroups++;
+					groupsList+=box.getText().toString()+";";
 				}
 
 			}
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Checked: "+groupsList);
+
 			
 			for (CheckBox box : groupCheckBoxes) {
 				if (!box.isChecked()) { 
