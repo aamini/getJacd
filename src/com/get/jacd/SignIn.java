@@ -38,7 +38,8 @@ public class SignIn extends Activity {
 		super.onStart();
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);
 		FlurryAgent.onPageView();
-		FlurryAgent.logEvent("Start: SignIn");
+		//FlurryAgent.logEvent("Start: SignIn");
+		ParseLog.Log("",System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
 
 	}
 	
@@ -57,7 +58,9 @@ public class SignIn extends Activity {
         SharedPreferences pref = getSharedPreferences(PREFS_NAME,MODE_PRIVATE);
         String rememberedEmail = pref.getString(PREF_EMAIL, null);
         if (rememberedEmail!=null) {
-			FlurryAgent.logEvent("Auto-SignIn: "+rememberedEmail+";"+true);
+			//FlurryAgent.logEvent("Auto-SignIn: "+rememberedEmail+";"+true);
+			ParseLog.Log(rememberedEmail,System.currentTimeMillis(),this.getClass().getSimpleName(),"Auto SignIn");
+
         	signIn(rememberedEmail,true);
         }
         
@@ -80,7 +83,9 @@ public class SignIn extends Activity {
         	String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         	
         	CheckBox rememberCheck = (CheckBox) findViewById(R.id.remember_me_check);
-			FlurryAgent.logEvent("SignIn: "+accountName+";"+rememberCheck.isChecked());
+			//FlurryAgent.logEvent("SignIn: "+accountName+";"+rememberCheck.isChecked());
+			ParseLog.Log(accountName,System.currentTimeMillis(),this.getClass().getSimpleName(),"SignIn: "+rememberCheck.isChecked());
+
         	signIn(accountName,rememberCheck.isChecked());
         }
     }
@@ -123,7 +128,7 @@ public class SignIn extends Activity {
 			} else { //user already exists
 				//TODO: move directly to map
 	        	progress.dismiss();
-				FlurryAgent.logEvent("Transfer: SignIn, MapsActivity; "+accountName);
+				//FlurryAgent.logEvent("Transfer: SignIn, MapsActivity; "+accountName);
 
 				Intent myIntent = new Intent(SignIn.this, MapsActivity.class);
 	    	    myIntent.putExtra("email", accountName); //Optional parameters
@@ -138,7 +143,7 @@ public class SignIn extends Activity {
     	
     	progress.dismiss();
     	
-		FlurryAgent.logEvent("Transfer: SignIn, UserProfile; "+accountName);
+		//FlurryAgent.logEvent("Transfer: SignIn, UserProfile; "+accountName);
         //start profile setup intent 
         Intent myIntent = new Intent(SignIn.this, UserProfile.class);
         myIntent.putExtra("email", accountName); //Optional parameters
@@ -160,7 +165,8 @@ public class SignIn extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
-			FlurryAgent.logEvent("No internet available: SignIn");
+			//FlurryAgent.logEvent("No internet available: SignIn");
+			ParseLog.Log("",System.currentTimeMillis(),this.getClass().getSimpleName(),"No Internet");
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")

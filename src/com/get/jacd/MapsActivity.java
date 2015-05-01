@@ -96,7 +96,8 @@ public class MapsActivity extends FragmentActivity {
         super.onStart();
         FlurryAgent.onStartSession(this, App.FLURRY_ID);		
         FlurryAgent.onPageView();
-		FlurryAgent.logEvent("Start: MapsActivity");
+		//FlurryAgent.logEvent("Start: MapsActivity");
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
 
     }
     
@@ -436,7 +437,8 @@ public class MapsActivity extends FragmentActivity {
 				mMap.animateCamera(CameraUpdateFactory.zoomTo(15));// Zoom in the Google Map
 				firstMapDraw=false;
 			}
-			FlurryAgent.logEvent("Location: "+USER_EMAIL+","+location.getLatitude()+","+location.getLongitude());
+			//FlurryAgent.logEvent("Location: "+USER_EMAIL+","+System.currentTimeMillis()+","+location.getLatitude()+","+location.getLongitude());
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),location.getLatitude(),location.getLongitude());
 
 			// Saves location to server -> only if running
 			if (isRunning) {
@@ -494,10 +496,11 @@ public class MapsActivity extends FragmentActivity {
 			if (startRunButton.getText().equals("Start Run!")) {
 				isRunning = true;
 				startRunButton.setText("End Run!");
+
 			} else if (startRunButton.getText().equals("End Run!")) {
 				isRunning = false;
 				startRunButton.setText("Start Run!");
-				FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
+				//FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
 
 			} else {
 				Toast.makeText(getApplicationContext(), "Unknown state of button!?", Toast.LENGTH_SHORT).show();
@@ -511,8 +514,9 @@ public class MapsActivity extends FragmentActivity {
                         user.put("Running", isRunning);
                         try {
                             user.save();
-							FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
-							
+							//FlurryAgent.logEvent("MapsActivity Running: "+isRunning+";"+USER_EMAIL);
+							ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Running: "+isRunning);
+
                         } catch (ParseException e1) { //TODO:exceptions
                         	e1.printStackTrace();
                         }
@@ -595,7 +599,8 @@ public class MapsActivity extends FragmentActivity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available && !internetAlert.isShowing()) {
-			FlurryAgent.logEvent("MapsActivity: No Internet Available");
+			//FlurryAgent.logEvent("MapsActivity: No Internet Available");
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"No Internet");
 
 			internetAlert.show();
 		}
@@ -619,7 +624,8 @@ public class MapsActivity extends FragmentActivity {
         
         switch (item.getItemId()) {
         case (R.id.menu_main_logout):
-			FlurryAgent.logEvent("MapsActivity Logout: "+USER_EMAIL);
+			//FlurryAgent.logEvent("MapsActivity Logout: "+USER_EMAIL);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Logout");
 
     		getSharedPreferences(SignIn.PREFS_NAME, MODE_PRIVATE)
     		.edit()

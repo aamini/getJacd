@@ -54,7 +54,9 @@ public class CreateGroup extends Activity {
 		super.onStart();
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);		
         FlurryAgent.onPageView();
-		FlurryAgent.logEvent("Start: CreateGroup");
+		//FlurryAgent.logEvent("Start: CreateGroup");
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
+
 	}
 	
 	@Override
@@ -188,7 +190,9 @@ public class CreateGroup extends Activity {
 						group.save();
 						
 						Toast.makeText(getApplication(), "New Group: "+name.getText()+" created!", Toast.LENGTH_SHORT).show();
-						FlurryAgent.logEvent("CreateGroup Created: "+USER_EMAIL+";"+name.getText());
+						//FlurryAgent.logEvent("CreateGroup Created: "+USER_EMAIL+";"+name.getText());
+						ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Created: "+name.getText());
+
 
 						progress.dismiss();
 						Intent myIntent = new Intent(CreateGroup.this, GroupProfile.class);
@@ -197,7 +201,8 @@ public class CreateGroup extends Activity {
 		                CreateGroup.this.startActivity(myIntent);
 		            	finish();
 					} catch (ParseException e1) {
-						FlurryAgent.logEvent("CreateGroup Error Saving: "+e.getMessage()+";"+USER_EMAIL+";"+name.getText());
+						//FlurryAgent.logEvent("CreateGroup Error Saving: "+e.getMessage()+";"+USER_EMAIL+";"+name.getText());
+						ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Error: "+name.getText()+";"+e.getMessage());
 
     	            	new CustomAlertDialog(
     	            			getApplicationContext(), 
@@ -222,7 +227,8 @@ public class CreateGroup extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
-			FlurryAgent.logEvent("CreateGroup No Internet: "+USER_EMAIL+";"+name.getText());
+			//FlurryAgent.logEvent("CreateGroup No Internet: "+USER_EMAIL+";"+name.getText());
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"No Internet");
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")

@@ -48,7 +48,9 @@ public class SearchGroups extends Activity {
         super.onStart();
         FlurryAgent.onStartSession(this, App.FLURRY_ID);		
         FlurryAgent.onPageView();
-		FlurryAgent.logEvent("Start: SearchGroups");
+		//FlurryAgent.logEvent("Start: SearchGroups");			
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
+
     }
     
     @Override
@@ -74,7 +76,9 @@ public class SearchGroups extends Activity {
 			public void onClick(View v) {
 				if (isNetworkAvailable()) {
 					String input = searchInput.getText().toString();
-					FlurryAgent.logEvent("Search requested: "+input+";"+USER_EMAIL);
+					//FlurryAgent.logEvent("Search requested: "+input+";"+USER_EMAIL);
+					ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Search: "+input);
+
 					search(input);
 				}
 			}
@@ -125,8 +129,10 @@ public class SearchGroups extends Activity {
 			public void onItemClick(AdapterView<?> parent, View viewClicked, int position, long id) {
 				TextView textView = (TextView) viewClicked; 
 				
-				FlurryAgent.logEvent("Clicked: "+textView.getText().toString()+";"+USER_EMAIL);
-				FlurryAgent.logEvent("Transfer: SearchGroups, GroupProfile;"+USER_EMAIL);
+				//FlurryAgent.logEvent("Clicked: "+textView.getText().toString()+";"+USER_EMAIL);
+				ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Clicked: "+textView.getText().toString());
+
+				//FlurryAgent.logEvent("Transfer: SearchGroups, GroupProfile;"+USER_EMAIL);
 
 				//the textView is clicked, so we want to progress to Group Profile
 				Intent myIntent = new Intent(SearchGroups.this, GroupProfile.class); //current class, next class
@@ -150,7 +156,8 @@ public class SearchGroups extends Activity {
 
 		if (!available) {
 			
-			FlurryAgent.logEvent("No internet available: SearchGroups;"+USER_EMAIL);
+			//FlurryAgent.logEvent("No internet available: SearchGroups;"+USER_EMAIL);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"No Internet");
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")

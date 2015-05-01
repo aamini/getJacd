@@ -52,7 +52,9 @@ public class GroupProfile extends Activity {
         super.onStart();
         FlurryAgent.onStartSession(this, App.FLURRY_ID);			
         FlurryAgent.onPageView();		
-		FlurryAgent.logEvent("Start: GroupProfile");
+		//FlurryAgent.logEvent("Start: GroupProfile");
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
+
     }
     
     @Override
@@ -69,7 +71,8 @@ public class GroupProfile extends Activity {
 		Intent intent = getIntent();
 		USER_EMAIL = intent.getStringExtra("email");
 		GROUP_NAME = intent.getStringExtra("group"); 
-		FlurryAgent.logEvent("Open Group: "+USER_EMAIL+","+GROUP_NAME);
+		//FlurryAgent.logEvent("Open Group: "+USER_EMAIL+","+GROUP_NAME);
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Open: "+GROUP_NAME);
 
 		
 		initViews();
@@ -123,7 +126,9 @@ public class GroupProfile extends Activity {
 	}
 
 	private void loadUserGroupParse() {
-		FlurryAgent.logEvent("Loading GroupProfile Data: "+USER_EMAIL+","+GROUP_NAME);
+		//FlurryAgent.logEvent("Loading GroupProfile Data: "+USER_EMAIL+","+GROUP_NAME);
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Load: "+GROUP_NAME);
+
 		List<ParseObject> users = queryTableForValue("User", "Email", USER_EMAIL);
 		if (users!=null && users.size()>0) {
 			user = users.get(0);
@@ -160,7 +165,8 @@ public class GroupProfile extends Activity {
 		progress.dismiss();	
 
 		
-		FlurryAgent.logEvent("GroupProfile error: "+e.getMessage()+";"+USER_EMAIL+","+GROUP_NAME);
+		//FlurryAgent.logEvent("GroupProfile error: "+e.getMessage()+";"+USER_EMAIL+","+GROUP_NAME);
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Error: "+GROUP_NAME+";"+e.getMessage());
 
 		new AlertDialog.Builder(this)
 	    .setTitle("Error")
@@ -235,7 +241,9 @@ public class GroupProfile extends Activity {
 			try {
 				user.save();
 				group.save();
-				FlurryAgent.logEvent("GroupProfile "+title+": "+USER_EMAIL+","+GROUP_NAME);
+				//FlurryAgent.logEvent("GroupProfile "+title+": "+USER_EMAIL+","+GROUP_NAME);
+				ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),title+": "+GROUP_NAME);
+
 			} catch (ParseException e) {
 				errorDialog(e);
 			}
@@ -276,8 +284,9 @@ public class GroupProfile extends Activity {
 						try {
 							user.save();
 							group.save();
-							FlurryAgent.logEvent("GroupProfile Added user: "+newUserEmail
-									+";"+USER_EMAIL+","+GROUP_NAME);
+							//FlurryAgent.logEvent("GroupProfile Added user: "+newUserEmail+";"+USER_EMAIL+","+GROUP_NAME);
+							ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Added: "+newUserEmail+";"+GROUP_NAME);
+
 						} catch (ParseException e) {
 							errorDialog(e);
 						}
@@ -317,7 +326,9 @@ public class GroupProfile extends Activity {
 		int id = item.getItemId();
 		switch (id) {
 		case (R.id.menu_refresh):
-			FlurryAgent.logEvent("GroupProfile Refresh: "+USER_EMAIL+","+GROUP_NAME);
+			//FlurryAgent.logEvent("GroupProfile Refresh: "+USER_EMAIL+","+GROUP_NAME);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Refresh: "+GROUP_NAME);
+
 			refreshPage();
 			break;
 		}

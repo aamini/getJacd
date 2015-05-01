@@ -67,7 +67,9 @@ public class UserProfile extends Activity {
 		super.onStart();
 		FlurryAgent.onStartSession(this, App.FLURRY_ID);
 		FlurryAgent.onPageView();
-		FlurryAgent.logEvent("Start: UserProfile");
+		//FlurryAgent.logEvent("Start: UserProfile");
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Start");
+
 	}
 	
 	@Override
@@ -194,7 +196,8 @@ public class UserProfile extends Activity {
     } 
 	
     private void loadProfileFromParse() {
-		FlurryAgent.logEvent("Loading UserProfile: "+USER_EMAIL);
+		//FlurryAgent.logEvent("Loading UserProfile: "+USER_EMAIL);
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Load");
 
     	progress = new ProgressDialog(this);
     	progress.setTitle("Loading");
@@ -247,8 +250,9 @@ public class UserProfile extends Activity {
      * Save all content of page to Parse database
      */
     private void saveProfileToParse() {
-		FlurryAgent.logEvent("Saving UserProfile: "+USER_EMAIL);
-
+		//FlurryAgent.logEvent("Saving UserProfile: "+USER_EMAIL);
+		ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Saving");
+		
     	progress.setMessage("Saving Data...");
     	progress.show();
     	
@@ -360,7 +364,8 @@ public class UserProfile extends Activity {
 				&& activeNetworkInfo.isConnected();
 
 		if (!available) {
-			FlurryAgent.logEvent("No internet available: UserProfile; "+USER_EMAIL);
+			//FlurryAgent.logEvent("No internet available: UserProfile; "+USER_EMAIL);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"No Internet");
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 			builder.setMessage("Internet is off! Turn on to continue!")
@@ -393,12 +398,14 @@ public class UserProfile extends Activity {
 		int id = item.getItemId();
 		switch (id) {
 		case (R.id.menu_finish):
-			FlurryAgent.logEvent("UserProfile Finish: "+USER_EMAIL);
+			//FlurryAgent.logEvent("UserProfile Finish: "+USER_EMAIL);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Finish");
 
 			finishProfile();
 			return true;
 		case (R.id.menu_logout):
-			FlurryAgent.logEvent("UserProfile Logout: "+USER_EMAIL);
+			//FlurryAgent.logEvent("UserProfile Logout: "+USER_EMAIL);
+			ParseLog.Log(USER_EMAIL,System.currentTimeMillis(),this.getClass().getSimpleName(),"Logout");
 
     		getSharedPreferences(SignIn.PREFS_NAME, MODE_PRIVATE)
     		.edit()
